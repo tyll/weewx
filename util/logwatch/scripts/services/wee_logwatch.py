@@ -82,8 +82,6 @@ Extending the WeeWX logwatch script:
 
 
 """
-# TODO. Review cc3000 regexs and report specification
-# TODO. Review ws23xx regexs and report specification
 # TODO. Review ws28xx regexs and report specification
 # current to commit 3ec36d68a1b9db8de72e7c7d6e73d6ac32971efc
 
@@ -282,7 +280,6 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "weewx\.drivers\.cc3000: Packet:",
                    "weewx\.drivers\.cc3000: No data from sensors",
                    "weewx\.drivers\.cc3000: Logger is at \d+ records",
-                   "weewx\.drivers\.cc3000: Clearing all records from logger",
                    "weewx\.drivers\.cc3000: GenStartupRecords: since_ts=",
                    "weewx\.drivers\.cc3000: Downloading new records \(if any\)",
                    "weewx\.drivers\.cc3000: No rain in record:",
@@ -296,8 +293,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "weewx\.drivers\.cc3000: Flush input buffer",
                    "weewx\.drivers\.cc3000: Flush output buffer",
                    "weewx\.drivers\.cc3000: \S+: The resetting of timeout to \d+ took",
-                   "weewx\.drivers\.cc3000: \S+: times:",
                    "weewx\.drivers\.cc3000: \S+: Accepting empty string as cmd echo.",
+                   "weewx\.drivers\.cc3000: \S+: times: [0-9. ]+",
+                   "weewx\.drivers\.cc3000: \S+: Retry worked.  Total tries:",
                    "weewx\.drivers\.cc3000: Get firmware version",
                    "weewx\.drivers\.cc3000: Set echo to",
                    "weewx\.drivers\.cc3000: Get header",
@@ -313,8 +311,7 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "weewx\.drivers\.cc3000: Get min values",
                    "weewx\.drivers\.cc3000: Clear memory",
                    "weewx\.drivers\.cc3000: Get rain total",
-                   "weewx\.drivers\.cc3000: gen_records_since_ts: Asking for all records.",
-                   "weewx\.drivers\.cc3000: gen_records_since_ts: Asking for \d+ records.",
+                   "weewx\.drivers\.cc3000: gen_records_since_ts:",
                    "weewx\.drivers\.cc3000: gen_records\(\d+\)",
                    "weewx\.drivers\.cc3000: gen_records: Requested \d+ latest of \d+ records.",
                    "weewx\.drivers\.cc3000: DOWNLOAD",
@@ -506,10 +503,8 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "weewx\.drivers\.ws23xx: station enter",
                    "weewx\.drivers\.ws23xx: station exit",
                    "weewx\.drivers\.ws23xx: close LinuxSerialPort",
-                   "weewx\.drivers\.ws23xx: setting station clock to",
                    "weewx\.drivers\.ws23xx: station clock is",
                    "weewx\.drivers\.ws23xx: station archive interval is \d+ minutes",
-                   "weewx\.drivers\.ws23xx: clearing console memory",
                    "weewx\.drivers\.ws23xx: record count is",
                    "weewx\.drivers\.ws23xx: gen_records: since_ts=",
                    "weewx\.drivers\.ws23xx: using (computer|station) clock with latest_ts",
@@ -705,6 +700,119 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                     'image_gen_agg_errors': "weewx\.imagegenerator: aggregate interval required for aggregate type|weewx\.imagegenerator: line type \S+ skipped"
                 }
             },
+            'acurite': {
+                'acurite_loop_max_tries_error': "weewx\.drivers\.acurite: Max retries \(\d+\) exceeded for LOOP data",
+                'acurite_rain_count_dec': "weewx\.drivers\.acurite: rain counter decrement ignored:",
+                'errors': {
+                    'acurite_fail_loop_attempt': "weewx\.drivers\.acurite: Failed attempt \d+ of %d+ to get LOOP data:",
+                    'acurite_r3_read_fail': "weewx\.drivers\.acurite: R3: read failed \d+",
+                    'acurite_r3_usb_mode_3': "weewx\.drivers\.acurite: R3: put station in USB mode 3 to enable R3 data",
+                    'acurite_cannot_find_device': "weewx\.drivers\.acurite: Cannot find USB device with VendorID=",
+                    'acurite_cannot_claim_usb': "weewx\.drivers\.acurite: Unable to claim USB interface",
+                    'acurite_iface_release_fail': "weewx\.drivers\.acurite: release interface failed",
+                    'acurite_r1_stale_data': "weewx\.drivers\.acurite: R1: ignoring stale data (rssi indicates no communication from sensors):",
+                    'acurite_r1_bad_length': "weewx\.drivers\.acurite: R1: bad length:",
+                    'acurite_r1_bad_format': "weewx\.drivers\.acurite: R1: bad format:",
+                    'acurite_r1_no_sensors': "weewx\.drivers\.acurite: R1: no sensors found:",
+                    'acurite_r1_bogus_flavor': "weewx\.drivers\.acurite: R1: bogus message flavor",
+                    'acurite_r1_bogus_final_byte': "weewx\.drivers\.acurite: R1: bogus final byte",
+                    'acurite_r2_bad_length': "weewx\.drivers\.acurite: R2: bad length:",
+                    'acurite_r2_bad_format': "weewx\.drivers\.acurite: R2: bad format:",
+                    'acurite_r3_bad_value': "weewx\.drivers\.acurite: R3: bad value in row",
+                    'acurite_r3_bad_length': "weewx\.drivers\.acurite: R3: bad length in row",
+                    'acurite_r3_bad_format': "weewx\.drivers\.acurite: R3: bad format in row",
+                    'acurite_r2_unkown_cal': "weewx\.drivers\.acurite: R2: unknown calibration constants:",
+                    'acurite_r2_const_changed': "weewx\.drivers\.acurite: R2: constants changed: old:"
+                }
+            },
+            'cc3000': {
+                'cc3000_mem_usage_fail': "weewx\.drivers\.cc3000: Memory check: Cannot determine memory usage",
+                'cc3000_cleared_memory': "weewx\.drivers\.cc3000: Clearing all records from logger",
+                'cc3000_max_retries': "weewx\.drivers\.cc3000: Max retries (%d) exceeded",
+                'cc3000_no_sensor_data': "weewx\.drivers\.cc3000: No data from sensors",
+                'cc3000_set_time': "weewx\.drivers\.cc3000: Set time to",
+                'cc3000_set_dst': "weewx\.drivers\.cc3000: Set DST to",
+                'cc3000_set_units': "weewx\.drivers\.cc3000: Set units to",
+                'cc3000_set_log_interval': "weewx\.drivers\.cc3000: Set logging interval to",
+                'cc3000_set_channel': "weewx\.drivers\.cc3000: Set channel to",
+                'cc3000_set_baro_offset': "weewx\.drivers\.cc3000: Set barometer offset to",
+                'cc3000_reset_max': "weewx\.drivers\.cc3000: Reset max values",
+                'cc3000_reset_min': "weewx\.drivers\.cc3000: Reset min values",
+                'cc3000_mem_clear': "weewx\.drivers\.cc3000: MEM=CLEAR succeeded.",
+                'cc3000_reset_rain': "weewx\.drivers\.cc3000: Reset rain counter",
+                'errors': {
+                    'cc3000_get_data_fail_attempt': "weewx\.drivers\.cc3000: Failed attempt \d+ of \d+ to get data:",
+                    'cc3000_gettime_fail': "weewx\.drivers\.cc3000: getTime failed:",
+                    'cc3000_init_fail_attempt': "weewx\.drivers\.cc3000: Failed attempt \d+ of \d+ to initialize station:",
+                    'cc3000_val_hdr_mismatch': "weewx\.drivers\.cc3000: Values/header mismatch:",
+                    'cc3000_parse_fail': "weewx\.drivers\.cc3000: Parse failed for",
+                    'cc3000_cmd_timeout_info': "weewx\.drivers\.cc3000: \S+: times: [^\t\n\r\f\v] -retrying",
+                    'cc3000_echo_timeout': "weewx\.drivers\.cc3000: \S+: Reading cmd echo timed out",
+                    'cc3000_retry_fail': "weewx\.drivers\.cc3000: \S+: Retry failed.",
+                    'cc3000_unexpected_rec': "weewx\.drivers\.cc3000: Unexpected record"
+                }
+            },
+            'fousb': {
+                'fousb_read_block_change': "weewx\.drivers\.fousb: read_block change",
+                'fousb_rain_count_dec': "weewx\.drivers\.fousb: ignoring spurious rain counter decrement",
+                'fousb_rain_count_wrap': "weewx\.drivers\.fousb: rain counter wraparound detected",
+                'fousb_power_cycles_attempted': "weewx\.drivers\.fousb: Attempting to power cycle",
+                'fousb_power_cycles_completed': "weewx\.drivers\.fousb: Power cycle complete",
+                'fousb_sync_to_station': "weewx\.drivers\.fousb: synchronised to",
+                'fousb_unex_sensor_clk_change': "weewx\.drivers\.fousb: unexpected sensor clock change",
+                'fousb_setting_sensor_clk': "weewx\.drivers\.fousb: setting sensor clock",
+                'fousb_lost_sync': "weewx\.drivers\.fousb: lost sync",
+                'fousb_missed_interval': "weewx\.drivers\.fousb: missed interval",
+                'fousb_unexpected_clock_change': "weewx\.drivers\.fousb: unexpected station clock change",
+                'fousb_setting_stn_clk': "weewx\.drivers\.fousb: setting station clock ",
+                'fousb_lost_log_sync': "weewx\.drivers\.fousb: lost log sync",
+                'errors': {
+                    'fousb_get_interval_fail': "weewx\.drivers\.fousb: Get archive interval failed attempt %d+",
+                    'fousb_cannot_find_device': "weewx\.drivers\.fousb: Cannot find USB device with Vendor=",
+                    'fousb_cannot_claim_usb': "weewx\.drivers\.fousb: Unable to claim USB interface",
+                    'fousb_station_status': "weewx\.drivers\.fousb: station status ",
+                    'fousb_get_obs_fail': "weewx\.drivers\.fousb: get_observations failed:",
+                    'fousb_invalid_data': "weewx\.drivers\.fousb: invalid data in get_records at",
+                    'fousb_get_rec_fail': "weewx\.drivers\.fousb: get_records failed:",
+                    'fousb_invalid_data_while_sync': "weewx\.drivers\.fousb: invalid data while synchronising at",
+                    'fousb_unex_ptr_change': "weewx\.drivers\.fousb: unexpected ptr change",
+                    'fousb_changing_format': "weewx\.drivers\.fousb: changing data format from",
+                    'fousb_unstable_read': "weewx\.drivers\.fousb: unstable read: blocks differ for ptr",
+                    'fousb_unrecog_magic_number': "weewx\.drivers\.fousb: unrecognised magic number",
+                    'fousb_magic_num_changed': "weewx\.drivers\.fousb: magic number changed"
+                }
+            },
+            'te923': {
+                'errors': {
+                    'te923_skip_dupe_ts': "weewx\.drivers\.te923: skip packet with duplidate timestamp",
+                    'te923_cannot_find_device': "weewx\.drivers\.te923: Cannot find USB device with VendorID=",
+                    'te923_cannot_claim_usb': "weewx\.drivers\.te923: Unable to claim USB interface",
+                    'te923_rel_iface_fail': "weewx\.drivers\.te923: release interface failed:",
+                    'te923_read_timeout': "weewx\.drivers\.te923: timeout while reading: ignoring bytes:",
+                    'te923_wrong_num_bytes': "weewx\.drivers\.te923: read: wrong number of bytes:",
+                    'te923_write_wrong_bytes': "weewx\.drivers\.te923: write: ack got wrong number of bytes:",
+                    'te923_read_data_fail': "weewx\.drivers\.te923: Failed attempt \d+ of \d+ to read data:",
+                    'te923_write_data_fail': "weewx\.drivers\.te923: Failed attempt \d+ of \d+ to write data:",
+                    'te923_unrecog_mem_size': "weewx\.drivers\.te923: Unrecognised memory size",
+                    'te923_rec_index_exceeds_mem': "weewx\.drivers\.te923: record index of \d+ exceeds memory size of",
+                    'te923_too_many_rec': "weewx\.drivers\.te923: too many records requested \(\d+\), using",
+                    'te923_gen_rec_skip': "weewx\.drivers\.te923: gen_records: skip",
+                    'te923_no_data_at_add': "weewx\.drivers\.te923: get_record: no data at address",
+                    'te923_unrecog_interval': "weewx\.drivers\.te923: Unrecognized archive interval"
+                }
+            },
+            'ultimeter': {
+                'ultimeter_set_time': "weewx\.drivers\.ultimeter: Set station time to",
+                'ultimeter_set_year': "weewx\.drivers\.ultimeter: Set station year to",
+                'ultimeter_set_logger_mode': "weewx\.drivers\.ultimeter: Set station to logger mode",
+                'ultimeter_set_modem_mode': "weewx\.drivers\.ultimeter: Set station to modem mode",
+                'ultimeter_readings_max_retries': "weewx\.drivers\.ultimeter: Max retries \(\d+\) exceeded for readings",
+                'errors': {
+                    'ultimeter_get_time_fail': "weewx\.drivers\.ultimeter: get_time failed:",
+                    'ultimeter_get_readings_fail': "weewx\.drivers\.ultimeter: Failed attempt \d+ of \d+ to get readings:",
+                    'ultimeter_decode_fail': "weewx\.drivers\.ultimeter: Decode failed for"
+                }
+            },
             'vantage': {
                  'vantage_wakeup_fail': "ERROR weewx\.drivers\.vantage: Unable to wake up console",
                  'vantage_no_ack': "weewx\.drivers\.vantage: No <ACK> received from console",
@@ -752,118 +860,6 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                      'vantage_determine_hardware_retry': "weewx\.drivers\.vantage: _determine_hardware; retry",
                      'vantage_unknown_bucket': "weewx\.drivers\.vantage: Unknown bucket type",
                      'vantage_unknown_loop': "weewx\.drivers\.vantage: Unknown LOOP packet type"
-                }               
-            },
-            'fousb': {
-                'fousb_read_block_change': "weewx\.drivers\.fousb: read_block change",
-                'fousb_rain_count_dec': "weewx\.drivers\.fousb: ignoring spurious rain counter decrement",
-                'fousb_rain_count_wrap': "weewx\.drivers\.fousb: rain counter wraparound detected",
-                'fousb_power_cycles_attempted': "weewx\.drivers\.fousb: Attempting to power cycle",
-                'fousb_power_cycles_completed': "weewx\.drivers\.fousb: Power cycle complete",
-                'fousb_sync_to_station': "weewx\.drivers\.fousb: synchronised to",
-                'fousb_unex_sensor_clk_change': "weewx\.drivers\.fousb: unexpected sensor clock change",
-                'fousb_setting_sensor_clk': "weewx\.drivers\.fousb: setting sensor clock",
-                'fousb_lost_sync': "weewx\.drivers\.fousb: lost sync",
-                'fousb_missed_interval': "weewx\.drivers\.fousb: missed interval",
-                'fousb_unexpected_clock_change': "weewx\.drivers\.fousb: unexpected station clock change",
-                'fousb_setting_stn_clk': "weewx\.drivers\.fousb: setting station clock ",
-                'fousb_lost_log_sync': "weewx\.drivers\.fousb: lost log sync",
-                'errors': {
-                    'fousb_get_interval_fail': "weewx\.drivers\.fousb: Get archive interval failed attempt %d+",
-                    'fousb_cannot_find_device': "weewx\.drivers\.fousb: Cannot find USB device with Vendor=",
-                    'fousb_cannot_claim_usb': "weewx\.drivers\.fousb: Unable to claim USB interface",
-                    'fousb_station_status': "weewx\.drivers\.fousb: station status ",
-                    'fousb_get_obs_fail': "weewx\.drivers\.fousb: get_observations failed:",
-                    'fousb_invalid_data': "weewx\.drivers\.fousb: invalid data in get_records at",
-                    'fousb_get_rec_fail': "weewx\.drivers\.fousb: get_records failed:",
-                    'fousb_invalid_data_while_sync': "weewx\.drivers\.fousb: invalid data while synchronising at",
-                    'fousb_unex_ptr_change': "weewx\.drivers\.fousb: unexpected ptr change",
-                    'fousb_changing_format': "weewx\.drivers\.fousb: changing data format from",
-                    'fousb_unstable_read': "weewx\.drivers\.fousb: unstable read: blocks differ for ptr",
-                    'fousb_unrecog_magic_number': "weewx\.drivers\.fousb: unrecognised magic number",
-                    'fousb_magic_num_changed': "weewx\.drivers\.fousb: magic number changed"
-                }
-            },
-            'acurite': {
-                'acurite_loop_max_tries_error': "weewx\.drivers\.acurite: Max retries \(\d+\) exceeded for LOOP data",
-                'acurite_rain_count_dec': "weewx\.drivers\.acurite: rain counter decrement ignored:",
-                'errors': {
-                    'acurite_fail_loop_attempt': "weewx\.drivers\.acurite: Failed attempt \d+ of %d+ to get LOOP data:",
-                    'acurite_r3_read_fail': "weewx\.drivers\.acurite: R3: read failed \d+",
-                    'acurite_r3_usb_mode_3': "weewx\.drivers\.acurite: R3: put station in USB mode 3 to enable R3 data",
-                    'acurite_cannot_find_device': "weewx\.drivers\.acurite: Cannot find USB device with VendorID=",
-                    'acurite_cannot_claim_usb': "weewx\.drivers\.acurite: Unable to claim USB interface",
-                    'acurite_iface_release_fail': "weewx\.drivers\.acurite: release interface failed",
-                    'acurite_r1_stale_data': "weewx\.drivers\.acurite: R1: ignoring stale data (rssi indicates no communication from sensors):",
-                    'acurite_r1_bad_length': "weewx\.drivers\.acurite: R1: bad length:",
-                    'acurite_r1_bad_format': "weewx\.drivers\.acurite: R1: bad format:",
-                    'acurite_r1_no_sensors': "weewx\.drivers\.acurite: R1: no sensors found:",
-                    'acurite_r1_bogus_flavor': "weewx\.drivers\.acurite: R1: bogus message flavor",
-                    'acurite_r1_bogus_final_byte': "weewx\.drivers\.acurite: R1: bogus final byte",
-                    'acurite_r2_bad_length': "weewx\.drivers\.acurite: R2: bad length:",
-                    'acurite_r2_bad_format': "weewx\.drivers\.acurite: R2: bad format:",
-                    'acurite_r3_bad_value': "weewx\.drivers\.acurite: R3: bad value in row",
-                    'acurite_r3_bad_length': "weewx\.drivers\.acurite: R3: bad length in row",
-                    'acurite_r3_bad_format': "weewx\.drivers\.acurite: R3: bad format in row",
-                    'acurite_r2_unkown_cal': "weewx\.drivers\.acurite: R2: unknown calibration constants:",
-                    'acurite_r2_const_changed': "weewx\.drivers\.acurite: R2: constants changed: old:"
-                }
-            },
-            'cc3000': {
-                'cc3000_max_retries': "weewx\.drivers\.cc3000: Max retries (%d) exceeded",
-                'cc3000_gettime_fail': "weewx\.drivers\.cc3000: getTime failed:",
-                'cc3000_init_fail_attempt': "weewx\.drivers\.cc3000: Failed attempt \d+ of \d+ to initialize station:",
-                'cc3000_val_hdr_mismatch': "weewx\.drivers\.cc3000: Values/header mismatch:",
-                'cc3000_parse_fail': "weewx\.drivers\.cc3000: Parse failed for",
-                'cc3000_echo_timeout': "weewx\.drivers\.cc3000: \S+: Reading cmd echo timed out",
-                'cc3000_no_sensor_data': "weewx\.drivers\.cc3000: No data from sensors",
-                'cc3000_set_time': "weewx\.drivers\.cc3000: Set time to",
-                'cc3000_set_dst': "weewx\.drivers\.cc3000: Set DST to",
-                'cc3000_set_units': "weewx\.drivers\.cc3000: Set units to",
-                'cc3000_set_log_interval': "weewx\.drivers\.cc3000: Set logging interval to",
-                'cc3000_set_channel': "weewx\.drivers\.cc3000: Set channel to",
-                'cc3000_set_baro_offset': "weewx\.drivers\.cc3000: Set barometer offset to",
-                'cc3000_reset_max': "weewx\.drivers\.cc3000: Reset max values",
-                'cc3000_reset_min': "weewx\.drivers\.cc3000: Reset min values",
-                'cc3000_mem_clear': "weewx\.drivers\.cc3000: MEM=CLEAR succeeded.",
-                'cc3000_reset_rain': "weewx\.drivers\.cc3000: Reset rain counter",
-                'errors': {
-                    'cc3000_mem_usage_fail': "weewx\.drivers\.cc3000: Memory check: Cannot determine memory usage",
-                    'cc3000_get_data_fail_attempt': "weewx\.drivers\.cc3000: Failed attempt \d+ of \d+ to get data:",
-                    'cc3000_retry_worked': "weewx\.drivers\.cc3000: \S+: Retry worked.  Total tries:",
-                    'cc3000_retry_fail': "weewx\.drivers\.cc3000: \S+: Retry failed.",
-                    'cc3000_unexpected_rec': "weewx\.drivers\.cc3000: Unexpected record"
-                }
-            },
-            'te923': {
-                'errors': {
-                    'te923_skip_dupe_ts': "weewx\.drivers\.te923: skip packet with duplidate timestamp",
-                    'te923_cannot_find_device': "weewx\.drivers\.te923: Cannot find USB device with VendorID=",
-                    'te923_cannot_claim_usb': "weewx\.drivers\.te923: Unable to claim USB interface",
-                    'te923_rel_iface_fail': "weewx\.drivers\.te923: release interface failed:",
-                    'te923_read_timeout': "weewx\.drivers\.te923: timeout while reading: ignoring bytes:",
-                    'te923_wrong_num_bytes': "weewx\.drivers\.te923: read: wrong number of bytes:",
-                    'te923_write_wrong_bytes': "weewx\.drivers\.te923: write: ack got wrong number of bytes:",
-                    'te923_read_data_fail': "weewx\.drivers\.te923: Failed attempt \d+ of \d+ to read data:",
-                    'te923_write_data_fail': "weewx\.drivers\.te923: Failed attempt \d+ of \d+ to write data:",
-                    'te923_unrecog_mem_size': "weewx\.drivers\.te923: Unrecognised memory size",
-                    'te923_rec_index_exceeds_mem': "weewx\.drivers\.te923: record index of \d+ exceeds memory size of",
-                    'te923_too_many_rec': "weewx\.drivers\.te923: too many records requested \(\d+\), using",
-                    'te923_gen_rec_skip': "weewx\.drivers\.te923: gen_records: skip",
-                    'te923_no_data_at_add': "weewx\.drivers\.te923: get_record: no data at address",
-                    'te923_unrecog_interval': "weewx\.drivers\.te923: Unrecognized archive interval"
-                }
-            },
-            'ultimeter': {
-                'ultimeter_set_time': "weewx\.drivers\.ultimeter: Set station time to",
-                'ultimeter_set_year': "weewx\.drivers\.ultimeter: Set station year to",
-                'ultimeter_set_logger_mode': "weewx\.drivers\.ultimeter: Set station to logger mode",
-                'ultimeter_set_modem_mode': "weewx\.drivers\.ultimeter: Set station to modem mode",
-                'ultimeter_readings_max_retries': "weewx\.drivers\.ultimeter: Max retries \(\d+\) exceeded for readings",
-                'errors': {
-                    'ultimeter_get_time_fail': "weewx\.drivers\.ultimeter: get_time failed:",
-                    'ultimeter_get_readings_fail': "weewx\.drivers\.ultimeter: Failed attempt \d+ of \d+ to get readings:",
-                    'ultimeter_decode_fail': "weewx\.drivers\.ultimeter: Decode failed for"
                 }
             },
             'wmr9x8': {
@@ -974,7 +970,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
             'ws23xx': {
                 'ws23xx_conn_changed': "weewx\.drivers\.ws23xx: connection changed from",
                 'ws23xx_exceed_loop_retries': "weewx\.drivers\.ws23xx: Max retries \(\d+\) exceeded for LOOP data",
+                'ws23xx_set_station_clock': "weewx\.drivers\.ws23xx: setting station clock to",
                 'ws23xx_set_hware_interval': "weewx\.drivers\.ws23xx: setting hardware archive interval to \d+ minutes",
+                'ws23xx_clear_memory': "weewx\.drivers\.ws23xx: clearing console memory",
                 'errors': {
                     'ws23xx_loop_attempt_fail': "weewx\.drivers\.ws23xx: Failed attempt \d+ of \d+ to get LOOP data:",
                     'ws23xx_invalid_wind_speed': "weewx\.drivers\.ws23xx: invalid wind reading: speed="
@@ -1090,6 +1088,145 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                         ]
                     }
                 },
+                'acurite': {
+                    'label': "Acurite",
+                    'items': [
+                        {'acurite_loop_max_tries_error': "Maximum retries to get LOOP data exceeded"},
+                        {'acurite_rain_count_dec': "Rain counter decrement ignored"},
+                    ],
+                    'errors': {
+                        'label': "Errors",
+                        'items': [
+                            {'acurite_fail_loop_attempt': "Failed attempts to get LOOP data"},
+                            {'acurite_r3_read_fail': "R3 read failed"},
+                            {'acurite_cannot_find_device': "Cannot find USB device"},
+                            {'acurite_cannot_claim_usb': "Unable to claim USB interface"},
+                            {'acurite_iface_release_fail': "Interface release failed"},
+                            {'acurite_r1_bad_length': "R1 bad length"},
+                            {'acurite_r1_bad_format': "R1 bad format"},
+                            {'acurite_r1_no_sensors': "R1 no sensors found"},
+                            {'acurite_r1_bogus_flavor': "R1 bogus message flavor"},
+                            {'acurite_r1_bogus_final_byte': "R1 bogus final byte"},
+                            {'acurite_r2_bad_length': "R2 bad length"},
+                            {'acurite_r2_bad_format': "R2 bad format"},
+                            {'acurite_r2_unkown_cal': "R2 unknown calibration constants"},
+                            {'acurite_r2_const_changed': "R2 constants changed"},
+                            {'acurite_r3_bad_value': "R3 bad value in row"},
+                            {'acurite_r3_bad_length': "R3 bad length in row"},
+                            {'acurite_r3_bad_format': "R3 bad format in row"}
+                        ]
+                    }
+                },
+                'cc3000': {
+                    'label': "CC3000",
+                    'items': [
+                        {'cc3000_mem_usage_fail': "Unable to determine memory usage"},
+                        {'cc3000_cleared_memory': "Cleared all records from logger"},
+                        {'cc3000_max_retries': "Exceeded maximum tries to get data"},
+                        {'cc3000_no_sensor_data': "No data from sensors"},
+                        {'cc3000_set_time': "Station time set"},
+                        {'cc3000_set_dst': "Daylght saving set"},
+                        {'cc3000_set_units': "Units set"},
+                        {'cc3000_set_log_interval': "Logging interval set"},
+                        {'cc3000_set_channel': "Channel set"},
+                        {'cc3000_set_baro_offset': "Barometer offset set"},
+                        {'cc3000_reset_max': "Reset maximum values"},
+                        {'cc3000_reset_min': "Reset minimum values"},
+                        {'cc3000_mem_clear': "Station memory cleared"},
+                        {'cc3000_reset_rain': "Rain counter reset"}
+                    ],
+                    'errors': {
+                        'label': "Errors",
+                        'items': [
+                            {'cc3000_get_data_fail_attempt': "Failed attempts to get data"},
+                            {'cc3000_gettime_fail': "Failed to get station time"},
+                            {'cc3000_init_fail_attempt': "Failed attempts to initialize station"},
+                            {'cc3000_val_hdr_mismatch': "Values/header mismatch"},
+                            {'cc3000_parse_fail': "Parse failed"},
+                            {'cc3000_echo_timeout': "Reading command echo timed out"},
+                            {'cc3000_retry_fail': "Command retry failed"},
+                            {'cc3000_unexpected_rec': "Unexpected record"}
+                        ]
+                    }
+                },
+                'fousb': {
+                    'label': "FineOffset USB",
+                    'items': [
+                        {'fousb_read_block_change': "USB check: Bad reads"},
+                        {'fousb_rain_count_dec': "Spurious rain counter decrements ignored"},
+                        {'fousb_rain_count_wrap': "Rain counter wrap arounds"},
+                        {'fousb_power_cycles_attempted': "Power cycles attempted"},
+                        {'fousb_power_cycles_completed': "Power cycles completed"},
+                        {'fousb_sync_to_station': "Synchronised to station"},
+                        {'fousb_unex_sensor_clk_change': "Unexpected sensor clock change"},
+                        {'fousb_setting_sensor_clk': "Sensor clock set"},
+                        {'fousb_missed_interval': "Missed interval"},
+                        {'fousb_unexpected_clock_change': "Unexpected station clock change"},
+                        {'fousb_setting_stn_clk': "Station clock set"},
+                        {'fousb_lost_log_sync': "Lost log synchronisation"}
+                    ],
+                    'errors': {
+                        'label': "Errors",
+                        'items': [
+                            {'fousb_get_interval_fail': "Failed attempts to get archive interval"},
+                            {'fousb_cannot_find_device': "Cannot find USB device"},
+                            {'fousb_cannot_claim_usb': "Unable to claim USB interface"},
+                            {'fousb_station_status': "Station status changes"}, # leave out and just display lines ?
+                            {'fousb_get_obs_fail': "Failed to get observations"},
+                            {'fousb_invalid_data': "Invalid data in records from station memory"},
+                            {'fousb_get_rec_fail': "Failed to get records from station memory"},
+                            {'fousb_invalid_data_while_sync': "Invalid delay while synchronising"},
+                            {'fousb_lost_sync': "Lost synchronisation"},
+                            {'fousb_unex_ptr_change': "Unexpected pointer change"},
+                            {'fousb_changing_format': "Changing data format"},
+                            {'fousb_unstable_read': "Unstable read"},
+                            {'fousb_unrecog_magic_number': "Unrecognised magic number"},
+                            {'fousb_magic_num_changed': "Magic number changed"}
+                        ]
+                    }
+                },
+                'te923': {
+                    'label': "TE923",
+                    'errors': {
+                        'label': "Errors",
+                        'items': [
+                            {'te923_skip_dupe_ts': "Packets with duplicate timestamps skipped"},
+                            {'te923_cannot_find_device': "Cannot find USB device"},
+                            {'te923_cannot_claim_usb': "Unable to claim USB interface"},
+                            {'te923_rel_iface_fail': "Interface release failed"},
+                            {'te923_read_timeout': "Timeout while reading raw data"},
+                            {'te923_wrong_num_bytes': "Read: wrong number of bytes"},
+                            {'te923_write_wrong_bytes': "Write: acknowledgement got wrong number of bytes"},
+                            {'te923_read_data_fail': "Failed attempts to read data"},
+                            {'te923_write_data_fail': "Failed attempts to write data"},
+                            {'te923_unrecog_mem_size': "Unrecognised memory size"},
+                            {'te923_rec_index_exceeds_mem': "Record index exceeds memory size"},
+                            {'te923_too_many_rec': "Too many records requested"},
+                            {'te923_gen_rec_skip': "Generate records, record skipped"},
+                            {'te923_no_data_at_add': "Get record, no data at address"},
+                            {'te923_unrecog_interval': "Unrecognized archive interval"}
+                        ]
+                    }
+                },
+                'ultimeter': {
+                    'label': "Ultimeter",
+                    'items': [
+                        {'ultimeter_set_time': "Set station time"},
+                        {'ultimeter_set_year': "Set station year"},
+                        {'ultimeter_set_logger_mode': "Set station to logger mode"},
+                        {'ultimeter_set_modem_mode': "Set station to modem mode"},
+                        {'ultimeter_readings_max_retries': "Maximum retries to get readings exceeded"},
+                        {'acurite_rain_count_dec': "Rain counter decrement ignored"},
+                    ],
+                    'errors': {
+                        'label': "Errors",
+                        'items': [
+                            {'ultimeter_get_time_fail': "Failed to get time"},
+                            {'ultimeter_get_readings_fail': "Failed attempts to get readings"},
+                            {'ultimeter_decode_fail': "Decode failed"}
+                        ]
+                    }
+                },
                 'vantage': {
                     'label': "Vantage",
                     'items': [
@@ -1139,113 +1276,6 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'vantage_unknown_loop': "Unknown LOOP packet type"}
                         ]
                     },
-                },
-                'fousb': {
-                    'label': "FineOffset USB",
-                    'items': [
-                        {'fousb_read_block_change': "USB check: Bad reads"},
-                        {'fousb_rain_count_dec': "Spurious rain counter decrements ignored"},
-                        {'fousb_rain_count_wrap': "Rain counter wrap arounds"},
-                        {'fousb_power_cycles_attempted': "Power cycles attempted"},
-                        {'fousb_power_cycles_completed': "Power cycles completed"},
-                        {'fousb_sync_to_station': "Synchronised to station"},
-                        {'fousb_unex_sensor_clk_change': "Unexpected sensor clock change"},
-                        {'fousb_setting_sensor_clk': "Sensor clock set"},
-                        {'fousb_missed_interval': "Missed interval"},
-                        {'fousb_unexpected_clock_change': "Unexpected station clock change"},
-                        {'fousb_setting_stn_clk': "Station clock set"},
-                        {'fousb_lost_log_sync': "Lost log synchronisation"}
-                    ],
-                    'errors': {
-                        'label': "Errors",
-                        'items': [
-                            {'fousb_get_interval_fail': "Failed attempts to get archive interval"},
-                            {'fousb_cannot_find_device': "Cannot find USB device"},
-                            {'fousb_cannot_claim_usb': "Unable to claim USB interface"},
-                            {'fousb_station_status': "Station status changes"}, # leave out and just display lines ?
-                            {'fousb_get_obs_fail': "Failed to get observations"},
-                            {'fousb_invalid_data': "Invalid data in records from station memory"},
-                            {'fousb_get_rec_fail': "Failed to get records from station memory"},
-                            {'fousb_invalid_data_while_sync': "Invalid delay while synchronising"},
-                            {'fousb_lost_sync': "Lost synchronisation"},
-                            {'fousb_unex_ptr_change': "Unexpected pointer change"},
-                            {'fousb_changing_format': "Changing data format"},
-                            {'fousb_unstable_read': "Unstable read"},
-                            {'fousb_unrecog_magic_number': "Unrecognised magic number"},
-                            {'fousb_magic_num_changed': "Magic number changed"}
-                        ]
-                    }
-                },
-                'acurite': {
-                    'label': "Acurite",
-                    'items': [
-                        {'acurite_loop_max_tries_error': "Maximum retries to get LOOP data exceeded"},
-                        {'acurite_rain_count_dec': "Rain counter decrement ignored"},
-                    ],
-                    'errors': {
-                        'label': "Errors",
-                        'items': [
-                            {'acurite_fail_loop_attempt': "Failed attempts to get LOOP data"},
-                            {'acurite_r3_read_fail': "R3 read failed"},
-                            {'acurite_cannot_find_device': "Cannot find USB device"},
-                            {'acurite_cannot_claim_usb': "Unable to claim USB interface"},
-                            {'acurite_iface_release_fail': "Interface release failed"},
-                            {'acurite_r1_bad_length': "R1 bad length"},
-                            {'acurite_r1_bad_format': "R1 bad format"},
-                            {'acurite_r1_no_sensors': "R1 no sensors found"},
-                            {'acurite_r1_bogus_flavor': "R1 bogus message flavor"},
-                            {'acurite_r1_bogus_final_byte': "R1 bogus final byte"},
-                            {'acurite_r2_bad_length': "R2 bad length"},
-                            {'acurite_r2_bad_format': "R2 bad format"},
-                            {'acurite_r2_unkown_cal': "R2 unknown calibration constants"},
-                            {'acurite_r2_const_changed': "R2 constants changed"},
-                            {'acurite_r3_bad_value': "R3 bad value in row"},
-                            {'acurite_r3_bad_length': "R3 bad length in row"},
-                            {'acurite_r3_bad_format': "R3 bad format in row"}
-                        ]
-                    }
-                },
-                'te923': {
-                    'label': "TE923",
-                    'errors': {
-                        'label': "Errors",
-                        'items': [
-                            {'te923_skip_dupe_ts': "Packets with duplicate timestamps skipped"},
-                            {'te923_cannot_find_device': "Cannot find USB device"},
-                            {'te923_cannot_claim_usb': "Unable to claim USB interface"},
-                            {'te923_rel_iface_fail': "Interface release failed"},
-                            {'te923_read_timeout': "Timeout while reading raw data"},
-                            {'te923_wrong_num_bytes': "Read: wrong number of bytes"},
-                            {'te923_write_wrong_bytes': "Write: acknowledgement got wrong number of bytes"},
-                            {'te923_read_data_fail': "Failed attempts to read data"},
-                            {'te923_write_data_fail': "Failed attempts to write data"},
-                            {'te923_unrecog_mem_size': "Unrecognised memory size"},
-                            {'te923_rec_index_exceeds_mem': "Record index exceeds memory size"},
-                            {'te923_too_many_rec': "Too many records requested"},
-                            {'te923_gen_rec_skip': "Generate records, record skipped"},
-                            {'te923_no_data_at_add': "Get record, no data at address"},
-                            {'te923_unrecog_interval': "Unrecognized archive interval"}
-                        ]
-                    }
-                },
-                'ultimeter': {
-                    'label': "Ultimeter",
-                    'items': [
-                        {'ultimeter_set_time': "Set station time"},
-                        {'ultimeter_set_year': "Set station year"},
-                        {'ultimeter_set_logger_mode': "Set station to logger mode"},
-                        {'ultimeter_set_modem_mode': "Set station to modem mode"},
-                        {'ultimeter_readings_max_retries': "Maximum retries to get readings exceeded"},
-                        {'acurite_rain_count_dec': "Rain counter decrement ignored"},
-                    ],
-                    'errors': {
-                        'label': "Errors",
-                        'items': [
-                            {'ultimeter_get_time_fail': "Failed to get time"},
-                            {'ultimeter_get_readings_fail': "Failed attempts to get readings"},
-                            {'ultimeter_decode_fail': "Decode failed"}
-                        ]
-                    }
                 },
                 'wmr9x8': {
                     'label': "WMR9x8",
@@ -1383,10 +1413,28 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                         ]
                     }
                 },
+                'ws23xx': {
+                    'label': "WS23XX",
+                    'items': [
+                        {'ws23xx_conn_changed': "Connection changed"},
+                        {'ws23xx_exceed_loop_retries': "Exceeded maximum tries to get LOOP data"},
+                        {'ws23xx_set_station_clock': "Station clock set"},
+                        {'ws23xx_set_hware_interval': "Hardware archive interval set"},
+                        {'ws23xx_clear_memory': "Clear console memory"}
+                    ],
+                    'errors': {
+                        'label': "Errors",
+                        'items': [
+                            {'ws23xx_loop_attempt_fail': "Failed attempts to get LOOP data"},
+                            {'ws23xx_invalid_wind_speed': "Invalid wind reading"}
+                        ]
+                    }
+                },
             }
         ]
     }
 }
+
 # locations to search for user specified loqwatch config file logwatch.conf
 LOCATIONS = ('/home/weewx/bin/user',
              '/usr/share/weewx/user',
