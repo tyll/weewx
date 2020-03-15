@@ -103,7 +103,7 @@ Extending the WeeWX logwatch script:
 # TODO. restx_response_exception should capture protocol name and error
 # TODO. restx_missing_config should capture protocol name and error
 # TODO. restx_missing_option should capture protocol name and error
-# current to commit 859930cfa940d60fe2a269c60b36c0c878eeec12
+# current to commit eb4d4e1dc05d5d064a7313b0607f196cd4a0a48f
 
 # Python imports
 from __future__ import absolute_import
@@ -796,7 +796,8 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                 'errors': {
                     'wxservices_unknown_extens_type': "weewx\.wxservices: Unknown extensible type",
                     'wxservices_unknown_agg': "weewx\.wxservices: Unknown aggregation",
-                    'wxservices_et_failed': "weewx\.wxservices: Calculation of evapotranspiration failed"
+                    'wxservices_et_failed': "weewx\.wxservices: Calculation of evapotranspiration failed",
+                    'wxservices_db_error_rainrate': "weewx\.wxservices: Database error while initializing rainRate:",
                 }
             },
             'image_generator': {
