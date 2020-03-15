@@ -136,7 +136,6 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "__main__: Debug is",
                    "__main__: Initializing engine",
                    "__main__: Starting up weewx version",
-
                    "__main__: \*\*\*\*  Waiting 60 seconds then retrying",
                    "__main__: Terminating weewx version",
                    "weewx\.engine: Loading station type",
@@ -690,7 +689,7 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                     'engine_archive_delay_long': "weewx\.engine: Archive delay \(\d+\) is unusually long",
                     'engine_ignore_hist_rec': "weewx\.engine: ignore historical record:",
                     'engine_catchup_error': "Internal error detected\. Catchup abandoned",
-                    'engine_catchupe_error_msg': "weewx\.engine: **** ",
+                    'engine_catchupe_error_msg': "weewx\.engine: \*\*\*\* ",
                     'engine_read_time_error': "weewx\.engine: Error reading time",
                     'engine_rep_thred_running': "weewx\.engine: Launch of report thread aborted: existing report thread still running",
                     'engine_prev_rep_thread_running': "weewx\.engine: Previous report thread has been running"
@@ -731,17 +730,17 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
 #                'qc_outside_limits': "weewx\.qc: %s %s value '%s' %s outside limits"
             },
             'reportengine': {
-                'reportengine_ignored': "weewx\.reportengine:         ****  Report ignored",
+                'reportengine_ignored': "weewx\.reportengine:         \*\*\*\*  Report ignored",
                 'reportengine_report_timing_skipped': "weewx\.reportengine: Report '[a-zA-Z0-9-_]+' skipped due to report_timing setting",
-                'report_engine_generator_ignored': "weewx\.reportengine:         ****  Generator ignored",
-                'report_engine_generator_terminated': "weewx\.reportengine:         ****  Generator terminated",
+                'report_engine_generator_ignored': "weewx\.reportengine:         \*\*\*\*  Generator ignored",
+                'report_engine_generator_terminated': "weewx\.reportengine:         \*\*\*\*  Generator terminated",
                 'errors': {
                     'reportengine_invalid_report_timing': "weewx\.reportengine: Invalid report_timing setting for report",
-                    'reportengine_invalid_report_timing_error': "weewx\.reportengine:       ****  ",
+                    'reportengine_invalid_report_timing_error': "weewx\.reportengine:       \*\*\*\*  ",
                     'reportengine_cannot_instantiate_gen': "weewx\.reportengine: Unable to instantiate generator",
-                    'reportengine_cannot_instantiate_gen_error': "weewx\.reportengine:         ****  ",
+                    'reportengine_cannot_instantiate_gen_error': "weewx\.reportengine:         \*\*\*\*  ",
                     'reportengine_unrecov_exception_gen': "weewx\.reportengine: Caught unrecoverable exception in generator",
-                    'reportengine_unrecov_exception_gen_error': "weewx\.reportengine:         ****  ",
+                    'reportengine_unrecov_exception_gen_error': "weewx\.reportengine:         \*\*\*\*  ",
                     'reportengine_cannot_read_skin_conf': "weewx\.reportengine: Cannot read skin configuration file",
                     'reportengine_failed_read_skin_conf': "weewx\.reportengine: Failed to read skin configuration file",
                 }
