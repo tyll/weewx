@@ -82,6 +82,27 @@ Extending the WeeWX logwatch script:
 
 
 """
+# TODO. confirm weewxd log entries
+
+# TODO. manager.py better log entry for lines 883 and 884
+# TODO. manager.py better log entry for lines 1032 and 1033
+# TODO. Get obs outside qc limits
+# TODO. reportengine.py maybe change format of line 173 output
+# TODO. reportengine.py maybe change format of line 189 output
+# TODO. need custom report method for rsync
+# TODO. ftp report needs checking to make sure all data is used where relevant
+# TODO. restx_db_error should capture protocol name and error
+# TODO. restx_upload_errors should capture protocol name and error
+# TODO. restx_bad_cert_wait should capture protocol name and error
+# TODO. restx_unexpect_exception should capture protocol name and error
+# TODO. restx_upload_attempt_fail should capture protocol name and error
+# TODO. restx_upload_attempt_fail_exception should capture protocol name and error
+# TODO. restx_bad_server should capture protocol name and error
+# TODO. restx_connection_error_attempt should capture protocol name and error
+# TODO. restx_socket_error_attempt should capture protocol name and error
+# TODO. restx_response_exception should capture protocol name and error
+# TODO. restx_missing_config should capture protocol name and error
+# TODO. restx_missing_option should capture protocol name and error
 # current to commit 859930cfa940d60fe2a269c60b36c0c878eeec12
 
 # Python imports
@@ -99,6 +120,7 @@ from configobj import ConfigObj
 # WeeWX logwatch script version
 WEEWX_LOGWATCH_VERSION = "0.1.0"
 
+
 WEEWX_LOGWATCH_CONFIG_DEFAULT = {
     'ingest': {
         'ignore': ["Starting weewx weather system",
@@ -113,6 +135,8 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "__main__: Using configuration file",
                    "__main__: Debug is",
                    "__main__: Initializing engine",
+                   "__main__: Starting up weewx version",
+
                    "__main__: \*\*\*\*  Waiting 60 seconds then retrying",
                    "__main__: Terminating weewx version",
                    "weewx\.engine: Loading station type",
@@ -120,9 +144,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "weewx\.engine: Loading service",
                    "weewx\.engine: Finished loading service",
                    "weewx\.engine: Starting main packet loop",
-                   "weewx\.engine: Main loop exiting. Shutting engine down.",
+                   "weewx\.engine: Main loop exiting\. Shutting engine down",
                    "weewx\.engine: StdConvert target unit is",
-                   "weewx\.engine: No calibration information in config file. Ignored.",
+                   "weewx\.engine: No calibration information in config file\. Ignored",
                    "weewx\.engine: Archive will use data binding",
                    "weewx\.engine: Record generation will be attempted in",
                    "weewx\.engine: Using archive interval of",
@@ -135,19 +159,17 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "weewx\.engine: StdReport thread has been terminated",
                    "weewx\.cheetahgenerator: Using search list",
                    "weewx\.cheetahgenerator: Skip ",
-                   "weewx\.imagegenerator: Skip ",
+                   "weewx\.imagegenerator: Skip '",
                    "weewx\.manager: Created and initialized table",
                    "weewx\.manager: Daily summary version is",
                    "weewx\.manager: Created daily summary tables",
                    "weewx\.manager: Starting backfill of daily summaries",
                    "weewx\.manager: Processed \d+ records to backfill",
                    "weewx\.manager: Daily summaries up to date",
-                   "weewx\.manager: Created and initialized table",
                    "weewx\.reportengine: Running reports for time",
                    "weewx\.reportengine: Running reports for latest time in the database",
                    "weewx\.reportengine: Report '[a-zA-Z0-9-_]+' not enabled. Skipping.",
-                   "weewx\.reportengine: Running report",
-                   "weewx\.reportengine: Report '[a-zA-Z0-9-_]+' skipped due to report_timing setting",
+                   "weewx\.reportengine: Running report '",
                    "weewx\.reportengine: No generators specified for report",
                    "weewx\.reportengine: Found configuration file",
                    "weewx\.reportengine: ftpgenerator: FTP upload not requested. Skipped.",
@@ -156,12 +178,10 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "weewx\.database: maxwindspeed: Using database binding",
                    "weewx\.database: maxwindspeed: Database transactions will use",
                    "weewx\.database: maxwindspeed: Applying",
-                   "weewx\.database: maxwindspeed: Maximum windSpeed calculated",
                    "weewx\.database: maxwindspeed: This was a dry run.",
                    "weewx\.database: intervalweighting: This is a dry run.",
                    "weewx\.database: intervalweighting: Using database binding",
                    "weewx\.database: intervalweighting: Database transactions",
-                   "weewx\.database: intervalweighting: .+ not applied",
                    "weewx\.database: intervalweighting: Multiple distinct 'interval'",
                    "weewx\.database: intervalweighting: .+ will be applied by dropping",
                    "weewx\.database: intervalweighting: .+ has already been applied",
@@ -171,11 +191,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "weewx\.database: intervalweighting: .+ has already been applied",
                    "weewx\.database: intervalweighting: Checking table",
                    "weewx\.database: intervalweighting: Successfully checked",
-                   "weewx\.database: intervalweighting: Processed .+ consisting of \d+ records.",
+                   "weewx\.database: intervalweighting: Processed .+ consisting of .+ would have been updated",
                    "weewx\.restx: Shut down .+ thread",
-                   "weewx\.restx: No database specified. Augmentation from database skipped.",
-                   "weewx\.restx: .+: Skipped record",
-                   "weewx\.restx: .+: record .+ is stale",
+                   "weewx\.restx: ([^:]*): record .+ is stale",
                    "weewx\.restx: wait interval [()0-9<]+ has not passed for record",
                    "weewx\.restx: WU essentials:",
                    "weewx\.restx: Wunderground-PWS: Data for station",
@@ -188,12 +206,10 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "weewx\.restx: WOW: url: ",
                    "weewx\.restx: CWOP: Data for station",
                    "weewx\.restx: CWOP: packet: ",
-                   "weewx\.restx: : Connected to server",
+                   "weewx\.restx: ([^:]*): Connected to server",
                    "weewx\.restx: StationRegistry: Registration not requested.",
                    "weewx\.restx: StationRegistry: Station will be registered.",
-                   "weewx\.restx: StationRegistry: wait interval",
                    "weewx\.restx: AWEKAS: Data will be uploaded for user",
-                   "weewx\.restx: AWEKAS: No database specified. Augmentation from database skipped.",
                    "weewx\.restx: AWEKAS: url: ",
                    "weewx\.restx: .+: Posting not enabled",
                    "weewx\.wxservices: The following values will be calculated:",
@@ -638,13 +654,13 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
             'startups': "__main__: Starting up weewx version",
             'hup_restarts': "__main__: Received signal HUP",
             'sigterm_shutdowns': "__main__: Received signal TERM \(15\)",
-            'kbd_interrupts': "engine: Keyboard interrupt",
-            'restarts': "engine: retrying",
+#            'kbd_interrupts': "engine: Keyboard interrupt",
+#            'restarts': "engine: retrying",
             'archive_records_added': "weewx\.manager: Added record [a-zA-Z0-9() :-]+ to database",
             'summary_records_added': "weewx\.manager: Added record [a-zA-Z0-9() :-]+ to daily summary",
-            'ftp_uploads': "ftpupload: Uploaded file",
-            'ftp_fails': "ftpupload: Failed to upload file",
-            'rsync_fails': "weeutil\.rsyncupload: .+ reported errors:",
+#            'ftp_uploads': "ftpupload: Uploaded file",
+#            'ftp_fails': "ftpupload: Failed to upload file",
+#            'rsync_fails': "weeutil\.rsyncupload: .+ reported errors:",
         },
         'sum': {
             'cheetah_generated': "weewx\.cheetahgenerator: Generated (\d+) files for report",
@@ -654,49 +670,153 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
             'rsync_uploads': "rsync\'d (\d+) files"
         },
         'itemised': {
-            'ftp': {
-                'ftp': "ftpgenerator: Ftp'd (\d+) files in (\d+) seconds",
+            'weewxd': {
+                'weewxd_unex_main_loop_exit': "__main__: Unexpected exit from main loop. Program exiting",
                 'errors': {
-                    'ftps_not_supported': "Your version of Python does not support FTPS. Using insecure connection.",
-                    'ftp_connect_fail_attempt': "Unable to connect or log into server",
-                    'ftp_connect_fail': "Attempted \d+ times to connect to server",
-                    'ftp_upload_fail_attempt': "Attempt \#\d+. Failed uploading",
-                    'ftp_make_dir_error': "Got error while attempting to make remote directory",
+                    'weewxd_unable_load_driver': "__main__: Unable to load driver",
+
+                }
+            },
+            'engine' : {
+                'engine_unable_launch_rep_thread': "weewx\.engine: Unable to launch report thread",
+                'engine_unable_shut_rep_thread': "weewx\.engine: Unable to shut down StdReport thread",
+                'errors': {
+                    'engine_driver_import_fail': "weewx\.engine: Import of driver failed:",
+                    'engine_packet_loop_exit': "weewx\.engine: Internal error\. Packet loop has exited",
+                    'engine_stdcal_loop_error': "weewx\.engine: StdCalibration loop error",
+                    'engine_stdcal_archive_error': "weewx\.engine: StdCalibration archive error",
+                    'engine_archive_int_error': "weewx\.engine: The archive interval in the configuration file",
+                    'engine_unknown_rec_gen': "weewx\.engine: Unknown type of record generation:",
+                    'engine_archive_delay_long': "weewx\.engine: Archive delay \(\d+\) is unusually long",
+                    'engine_ignore_hist_rec': "weewx\.engine: ignore historical record:",
+                    'engine_catchup_error': "Internal error detected\. Catchup abandoned",
+                    'engine_catchupe_error_msg': "weewx\.engine: **** ",
+                    'engine_read_time_error': "weewx\.engine: Error reading time",
+                    'engine_rep_thred_running': "weewx\.engine: Launch of report thread aborted: existing report thread still running",
+                    'engine_prev_rep_thread_running': "weewx\.engine: Previous report thread has been running"
+                }
+            },
+            'copy': {
+                'copy': "weewx\.reportengine: copygenerator: Copied (\d+) files to",
+            },
+            'ftp': {
+                'ftp': "weewx\.reportengine: ftpgenerator: Ftp'd (\d+) files in (\d+) seconds",
+                'ftp_ftps_not_supported': "weeutil\.ftpupload: Your version of Python does not support FTPS. Using insecure connection.",
+                'ftp_uploads': "weeutil\.ftpupload: ftpupload: Uploaded file",
+                'ftp_fails': "weeutil\.ftpupload: ftpupload: Failed to upload file",
+                'errors': {
+                    'ftp_exception': "weewx\.reportengine: ftpgenerator: Caught exception",
+                    'ftp_connect_fail_attempt': "weeutil\.ftpupload: Unable to connect or log into server",
+                    'ftp_connect_fail': "weeutil\.ftpupload: Attempted \d+ times to connect to server",
+                    'ftp_upload_fail_attempt': "weeutil\.ftpupload: Attempt \#\d+. Failed uploading",
+                    'ftp_make_dir_error': "weeutil\.ftpupload: Got error while attempting to make remote directory",
                     'ftp_error': "weeutil\.ftpupload:     \*\*\*\*  Error:",
-                    'ftp_make_dir_fail': "Unable to create remote directory"
+                    'ftp_make_dir_fail': "weeutil\.ftpupload: Unable to create remote directory"
+                }
+            },
+            'manager': {
+                'manager_cannot_open_db_no_schema': "weewx\.manager: Cannot open database, and no schema specified",
+                'manager_rec_null_time': "weewx\.manager: Archive record with null time encountered",
+                'manager_drop_summaries':"weewx\.manager: Dropping daily summary tables from",
+                'errors': {
+                    'manager_cannot_get_columns': "weewx\.manager: Cannot get columns of table",
+                    'manager_unable_create_table': "weewx\.manager: Unable to create table '",
+                    'manager_unable_add_rec': "weewx\.manager: Unable to add record",
+                    'manager_replace_failed': "weewx\.manager: Replace failed for database",
+                    'manager_drop_summaries_fail': "weewx\.manager: Dropped daily summary tables from database",
+                }
+            },
+            'qc': {
+                'qc_no_config': "weewx\.qc: No QC information in config file",
+#                'qc_outside_limits': "weewx\.qc: %s %s value '%s' %s outside limits"
+            },
+            'reportengine': {
+                'reportengine_ignored': "weewx\.reportengine:         ****  Report ignored",
+                'reportengine_report_timing_skipped': "weewx\.reportengine: Report '[a-zA-Z0-9-_]+' skipped due to report_timing setting",
+                'report_engine_generator_ignored': "weewx\.reportengine:         ****  Generator ignored",
+                'report_engine_generator_terminated': "weewx\.reportengine:         ****  Generator terminated",
+                'errors': {
+                    'reportengine_invalid_report_timing': "weewx\.reportengine: Invalid report_timing setting for report",
+                    'reportengine_invalid_report_timing_error': "weewx\.reportengine:       ****  ",
+                    'reportengine_cannot_instantiate_gen': "weewx\.reportengine: Unable to instantiate generator",
+                    'reportengine_cannot_instantiate_gen_error': "weewx\.reportengine:         ****  ",
+                    'reportengine_unrecov_exception_gen': "weewx\.reportengine: Caught unrecoverable exception in generator",
+                    'reportengine_unrecov_exception_gen_error': "weewx\.reportengine:         ****  ",
+                    'reportengine_cannot_read_skin_conf': "weewx\.reportengine: Cannot read skin configuration file",
+                    'reportengine_failed_read_skin_conf': "weewx\.reportengine: Failed to read skin configuration file",
                 }
             },
             'rsync': {
+                'rsync_executed': "weeutil\.rsyncupload: rsync executed in",
+                'rsync_files_uploaded': "weeutil\.rsyncupload: rsync'd (\d+) files \(([0-9,.]+).+\) in",
                 'errors': {
+                    'rsync_exception': "weewx\.reportengine: rsyncgenerator: Caught exception",
                     'rsync_not_installed': "rsync does not appear to be installed on",
-                    'rsync_errors': "weeutil\.rsyncupload .+ reported errors:"
+                    'rsync_errors': "weeutil\.rsyncupload: .+ reported errors:"
                 }
             },
             'restx': {
-                'restx_published': "weewx\.restx: ([^:]*): Published record",
+                'restc_no_augment': "weewx\.restx: No database specified\. Augmentation from database skipped",
                 'restx_skipped': "weewx\.restx: ([^:]*): Skipped record",
+                'restx_bad_login_wait': "weewx\.restx: ([^:]*): Bad login; waiting",
+                'restx_bad_login_terminate': "weewx\.restx: ([^:]*): Bad login; no retry specified. Terminating",
+                'restx_bad_cert_terminate': "weewx\.restx: .+: Bad SSL certificate; no retry specified. Terminating",
+                'restx_published': "weewx\.restx: ([^:]*): Published record",
+                'restx_no_stn_url': "weewx\.restx: StationRegistry: Station will not be registered: no station_url specified",
+                'restc_no_awekas_augment': "weewx\.restx: AWEKAS: No database specified. Augmentation from database skipped.",
                 'errors': {
                     'restx_shut_thread_fail': "weewx\.restx: Unable to shut down .+ thread",
-                    'restx_db_error': "weewx\.restx: .+: Database OperationalError",
-                    'restx_bad_login_wait': "weewx\.restx: .+: Bad login; waiting",
-                    'restx_bad_login_terminate': "weewx\.restx: .+: Bad login; no retry specified. Terminating",
+                    'restx_db_error': "weewx\.restx: ([^:]*): Database OperationalError",
                     'restx_upload_errors': "weewx\.restx: ([^:]*): Failed to publish",
-                    'restx_bad_cert_wait': "weewx\.restx: .+: Bad SSL certificate \(",
-                    'restx_bad_cert_terminate': "weewx\.restx: .+: Bad SSL certificate; no retry specified. Terminating",
-                    'restx_unexpect_exception': "weewx\.restx: .+: Unexpected exception of type",
-                    'restx_thread_terminate': "weewx\.restx: .+: Thread terminating. Reason:",
-                    'restx_upload_attempt_fail': "weewx\.restx: .+: Failed upload attempt",
-                    'restx_bad_server': "weewx\.restx: .+: Bad server address:",
-                    'restx_connection_error_attempt': "weewx\.restx: .+: Attempt \d+ to .+:\d+. Connection error:",
-                    'restx_socket_error_attempt': "weewx\.restx: .+: Attempt \d+ to .+:\d+. Socket send error:",
-                    'restx_response_exception': "weewx\.restx: .+: Exception .+ when looking for response to",
-                    'restx_missing_config': "weewx\.restx: .+: No config info. Skipped.",
-                    'restx_missing_option': "weewx\.restx: .+: Data will not be posted: Missing option"
+                    'restx_bad_cert_wait': "weewx\.restx: ([^:]*): Bad SSL certificate \(",
+                    'restx_unexpect_exception': "weewx\.restx: ([^:]*): Unexpected exception of type",
+                    'restx_thread_terminate': "weewx\.restx: ([^:]*): Thread terminating. Reason:",
+                    'restx_upload_attempt_fail_code': "weewx\.restx: ([^:]*): Failed upload attempt \d+: Code",
+                    'restx_upload_attempt_fail_exception': "weewx\.restx: ([^:]*): Failed upload attempt \d+: ",
+                    'restx_bad_server': "weewx\.restx: ([^:]*): Bad server address:",
+                    'restx_connection_error_attempt': "weewx\.restx: ([^:]*): Attempt \d+ to .+:\d+. Connection error:",
+                    'restx_socket_error_attempt': "weewx\.restx: ([^:]*): Attempt \d+ to .+:\d+. Socket send error:",
+                    'restx_response_exception': "weewx\.restx: ([^:]*): Exception .+ when looking for response to",
+                    'restx_missing_config': "weewx\.restx: ([^:]*): No config info. Skipped.",
+                    'restx_missing_option': "weewx\.restx: ([^:]*): Data will not be posted: Missing option"
                 },
+            },
+            'units': {
+                'errors': {
+                    'units_cannot_convert': "weewx\.units: Unable to convert from"
+                }
+            },
+            'wxformulas': {
+                'errors': {
+                    'wxformulas_rain_counter_reset': "weewx\.wxformulas: Rain counter reset detected"
+                }
+            },
+            'wxservices': {
+                'wxservices_et_mixed_units': "weewx\.wxservices: Mixed unit system not allowed in ET calculation",
+                'errors': {
+                    'wxservices_unknown_extens_type': "weewx\.wxservices: Unknown extensible type",
+                    'wxservices_unknown_agg': "weewx\.wxservices: Unknown aggregation",
+                    'wxservices_et_failed': "weewx\.wxservices: Calculation of evapotranspiration failed"
+                }
             },
             'image_generator': {
                 'errors': {
-                    'image_gen_agg_errors': "weewx\.imagegenerator: aggregate interval required for aggregate type|weewx\.imagegenerator: line type \S+ skipped"
+                    'image_gen_agg_errors': "weewx\.imagegenerator: aggregate interval required for aggregate type|weewx\.imagegenerator: line type \S+ skipped",
+                    'image_gen_gap_frac': "weewx\.imagegenerator: Gap fraction (0-1.) outside range",
+                    'image_gen_unable_save_file': "weewx\.imagegenerator: Unable to save to file",
+                }
+            },
+            'maxwindspeed_fix': {
+                'maxwindspeed_fix_applied': "weewx\.database: maxwindspeed: Maximum windSpeed calculated",
+                'errors': {
+                    'maxwindspeed_fix_fail': "weewx\.database: maxwindspeed: .+ not applied:"
+                }
+            },
+            'interval_weighting_fix': {
+                'db_interval_weight_applied': "weewx\.database: intervalweighting: Processed .+ consisting of .+ were updated",
+                'errors': {
+                    'db_interval_weight_not_applied': "weewx\.database: intervalweighting: .+ not applied",
+                    'db_interval_weight_fix_fail': "weewx\.database: intervalweighting: Interval weighting of .+ failed:"
                 }
             },
             'acurite': {
@@ -1007,16 +1127,6 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                     'ws28xx_cannot_terminate_rf_thread': "weewx\.drivers\.ws28xx: unable to terminate RF thread after \d+ seconds",
                     'ws28xx_dorf_exception': "weewx\.drivers\.ws28xx: exception in doRF:",
                     'ws28xx_gen_response_fail': "weewx\.drivers\.ws28xx: generateResponse failed:"
-                }
-            },
-            'maxwindspeed_fix': {
-                'errors': {
-                    'maxwindspeed_fix_fail': "weewx\.database: maxwindspeed: .+ not applied:"
-                }
-            },
-            'interval_weighting_fix': {
-                'errors': {
-                    'db_interval_weight_fix_fail': "weewx\.database: intervalweighting: Interval weighting of .+ failed:"
                 }
             }
         },
@@ -1471,7 +1581,6 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
         ]
     }
 }
-
 # locations to search for user specified loqwatch config file logwatch.conf
 LOCATIONS = ('/home/weewx/bin/user',
              '/usr/share/weewx/user',
