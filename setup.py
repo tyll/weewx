@@ -64,7 +64,7 @@ class weewx_install(install):
         rv = install.run(self)
 
         # Now the post-install
-        update_and_install_config(self.install_data)
+        update_and_install_config(self.install_data, self.install_scripts, self.install_lib)
 
         return rv
 
@@ -214,29 +214,50 @@ def move_with_timestamp(filepath):
     return newpath
 
 
-def update_and_install_config(install_dir, config_name='weewx.conf'):
-    """Install the configuration file, weewx.conf, updating it if necessary."""
+def update_and_install_config(install_dir, install_scripts, install_lib, config_name='weewx.conf'):
+    """Install the configuration file, weewx.conf, updating it if necessary.
+
+    install_dir: the directory containing the configuration file.
+
+    install_scripts: the directory containing the weewx executables.
+
+    install_lib: the directory containing the weewx packages.
+
+    config_name: the name of the configuration file. Defaults to 'weewx.conf'
+    """
 
     # This is where the weewx.conf file will go
     destination = os.path.join(install_dir, config_name)
+
     # Is there an existing file? If so, use it as the source. Otherwise,
     # use the file that came with the distribution.
     if os.path.isfile(destination):
         source = destination
+        no_prompt = True
     else:
         source = os.path.join(install_dir, config_name + '.' + VERSION)
+        no_prompt = False
+
+    # Command used to invoke wee_config:
+    args = [sys.executable,
+            os.path.join(install_scripts, 'wee_config'),
+            '--install',
+            '--dist-config=%s' % source,
+            '--output=%s' % destination,
+            ]
+    if no_prompt:
+        # If we are doing an upgrade, don't prompt.
+        args += ['--no-prompt']
+
     if DEBUG:
         print("Incoming weewx.conf path=%s" % source)
-        print("Processed weewx.conf path=%s" % destination)
-        print("Current python interpretor=%s" % sys.executable)
-    os.chdir(install_dir)
-
-    proc = subprocess.Popen([sys.executable,
-                             os.path.join(install_dir, 'bin/wee_config'),
-                             '--install',
-                             '--dist-config=%s' % source,
-                             '--output=%s' % destination,
-                             ],
+        print("Outgoing weewx.conf path=%s" % destination)
+        print("Command used to invoke wee_config: %s" % args)
+        print("install_scripts=%s" % install_scripts)
+        print("install_lib=%s" % install_lib)
+        
+    proc = subprocess.Popen(args,
+                            env={'PYTHONPATH' : install_lib},
                             stdin=sys.stdin,
                             stdout=sys.stdout,
                             stderr=sys.stderr)
