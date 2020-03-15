@@ -82,8 +82,7 @@ Extending the WeeWX logwatch script:
 
 
 """
-# TODO. Review ws28xx regexs and report specification
-# current to commit 3ec36d68a1b9db8de72e7c7d6e73d6ac32971efc
+# current to commit 859930cfa940d60fe2a269c60b36c0c878eeec12
 
 # Python imports
 from __future__ import absolute_import
@@ -511,11 +510,11 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "weewx\.drivers\.ws23xx: count is \d+ to satisfy timestamp",
                    "weewx\.drivers\.ws23xx: downloading \d+ records from station",
                    "weewx\.drivers\.ws28xx: frame length is",
+                   "weewx\.drivers\.ws28xx: (([a-zA-Z0-9]{2}) )+",
                    "weewx\.drivers\.ws28xx: driver version is",
                    "weewx\.drivers\.ws28xx: frequency is",
                    "weewx\.drivers\.ws28xx: no new weather data",
                    "weewx\.drivers\.ws28xx: Scanning historical records",
-                   "weewx\.drivers\.ws28xx: No historical data after",
                    "weewx\.drivers\.ws28xx: Scanned ",
                    "weewx\.drivers\.ws28xx: Found \d+ historical records",
                    "weewx\.drivers\.ws28xx: get station configuration",
@@ -980,11 +979,10 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
             },
             'ws28xx': {
                 'ws28xx_cannot_find_device': "weewx\.drivers\.ws28xx: Cannot find USB device with Vendor=",
-                'ws28xx_cannot_claim_usb': "weewx\.drivers\.ws28xx: Unable to claim USB interface",
                 'ws28xx_adjusted_freq': "weewx\.drivers\.ws28xx: adjusted frequency:",
                 'errors': {
-                    'ws28xx_no_new_data': "weewx\.drivers\.ws28xx: no new weather data",
                     'ws28xx_no_contact': "weewx\.drivers\.ws28xx: no contact with console",
+                    'ws28xx_no_hist_tries': "weewx\.drivers\.ws28xx: No historical data after",
                     'ws28xx_no_data': "weewx\.drivers\.ws28xx: No data after \d+ seconds",
                     'ws28xx_unknown_freq': "weewx\.drivers\.ws28xx: unknown frequency",
                     'ws28xx_bogus_date': "weewx\.drivers\.ws28xx: ToDateTime: bogus date for",
@@ -999,6 +997,7 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                     'ws28xx_gust_out_of_range': "weewx\.drivers\.ws28xx: setGust: value outside range",
                     'ws28xx_rel_press_unknown_fmt': "weewx\.drivers\.ws28xx: setPresRel: unknown format",
                     'ws28xx_rel_press_out_of_range': "weewx\.drivers\.ws28xx: setPresRel: value outside range",
+                    'ws28xx_cannot_claim_usb': "weewx\.drivers\.ws28xx: Unable to claim USB interface",
                     'ws28xx_inbufcs_not_match': "weewx\.drivers\.ws28xx: handleCurrentData: inBufCS of station does not match",
                     'ws28xx_outbufcs_changed': "weewx\.drivers\.ws28xx: handleCurrentData: outBufCS of station changed",
                     'ws28xx_history_too_many_reqs': "weewx\.drivers\.ws28xx: handleHistoryData: too many records requested",
@@ -1427,6 +1426,44 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                         'items': [
                             {'ws23xx_loop_attempt_fail': "Failed attempts to get LOOP data"},
                             {'ws23xx_invalid_wind_speed': "Invalid wind reading"}
+                        ]
+                    }
+                },
+                'ws28xx': {
+                    'label': "WS28XX",
+                    'items': [
+                        {'ws28xx_cannot_find_device': "Cannot find USB device"},
+                        {'ws28xx_adjusted_freq': "Adjusted frequency"}
+                    ],
+                    'errors': {
+                        'label': "Errors",
+                        'items': [
+                            {'ws28xx_no_contact': "No contact with console"},
+                            {'ws28xx_no_hist_tries': "Failed to obtain historical data"},
+                            {'ws28xx_no_data': "Timeout obtaining historical data"},
+                            {'ws28xx_unknown_freq': "Unknown frequency"},
+                            {'ws28xx_bogus_date': "Bogus date"},
+                            {'ws28xx_unknown_bytes': "Bytes with unknown meaning"},
+                            {'ws28xx_temp_unknown_fmt': "Unknown temperature format"},
+                            {'ws28xx_temp_out_of_range': "Temperature value out of range"},
+                            {'ws28xx_hum_out_of_range': "Humidity value out of range"},
+                            {'ws28xx_rain_unknown_fmt': "Unknown rain format"},
+                            {'ws28xx_rain_out_of_range': "Rain value outside range"},
+                            {'ws28xx_gust_unknown_fmt': "Unknown gust format"},
+                            {'ws28xx_gust_wrong_units': "Unknown gust units"},
+                            {'ws28xx_gust_out_of_range': "Gust value outside range"},
+                            {'ws28xx_rel_press_unknown_fmt': "Unknown relative pressure format"},
+                            {'ws28xx_rel_press_out_of_range': "Relative pressure value outside range"},
+                            {'ws28xx_cannot_claim_usb': "Unable to claim USB interface"},
+                            {'ws28xx_inbufcs_not_match': "inBufCS of station does not match"},
+                            {'ws28xx_outbufcs_changed': "outBufCS of station changed"},
+                            {'ws28xx_history_too_many_reqs': "Too many history data records requested"},
+                            {'ws28xx_history_index_mismatch': "History data index mismatch"},
+                            {'ws28xx_attempting_to_pair': "Console not paired"},
+                            {'ws28xx_unknown_device_id': "Unknown device ID"},
+                            {'ws28xx_cannot_terminate_rf_thread': "Unable to terminate RF thread"},
+                            {'ws28xx_dorf_exception': "Exception in doRF()"},
+                            {'ws28xx_gen_response_fail': "generateResponse() failed"}
                         ]
                     }
                 },
