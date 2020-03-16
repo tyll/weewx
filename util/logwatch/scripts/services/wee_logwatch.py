@@ -82,8 +82,6 @@ Extending the WeeWX logwatch script:
 
 
 """
-# TODO. confirm weewxd log entries
-
 # TODO. manager.py better log entry for lines 883 and 884
 # TODO. manager.py better log entry for lines 1032 and 1033
 # TODO. Get obs outside qc limits
@@ -136,7 +134,10 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "__main__: Debug is",
                    "__main__: Initializing engine",
                    "__main__: Starting up weewx version",
-                   "__main__: \*\*\*\*  Waiting 60 seconds then retrying",
+                   "__main__: [ *]+  Waiting \d+ (seconds|minutes) then retrying",
+                   "__main__: retrying",
+                   "__main__: [ *]+ Exiting",
+                   "__main__: Received signal HUP. Initiating restart",
                    "__main__: Terminating weewx version",
                    "weewx\.engine: Loading station type",
                    "weewx\.engine: No services in service group",
@@ -650,30 +651,28 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "weewx\.drivers\.ws28xx: SetTime/SetConfig data written"
                    ],
         'increment': {
-            'startups': "__main__: Starting up weewx version",
-            'hup_restarts': "__main__: Received signal HUP",
-            'sigterm_shutdowns': "__main__: Received signal TERM \(15\)",
-#            'kbd_interrupts': "engine: Keyboard interrupt",
-#            'restarts': "engine: retrying",
-            'archive_records_added': "weewx\.manager: Added record [a-zA-Z0-9() :-]+ to database",
-            'summary_records_added': "weewx\.manager: Added record [a-zA-Z0-9() :-]+ to daily summary",
-#            'ftp_uploads': "ftpupload: Uploaded file",
-#            'ftp_fails': "ftpupload: Failed to upload file",
-#            'rsync_fails': "weeutil\.rsyncupload: .+ reported errors:",
+            'weewxd_startups': "__main__: Starting up weewx version",
+            'weewxd_hup_restarts': "__main__: Received signal HUP\. Restarting",
+            'weewxd_sig_term': "__main__: Received signal TERM \(15\)",
+            'weewxd_keyboard_interrupt': "__main__: Keyboard interrupt",
+            'weewxd_unex_main_loop_exit': "__main__: Unexpected exit from main loop. Program exiting",
+            'weewxd_unrecoverable': "__main__: Caught unrecoverable exception:",
+            'weewxd_recovery_attempts': "__main__: retrying[.]+",
         },
         'sum': {
             'cheetah_generated': "weewx\.cheetahgenerator: Generated (\d+) files for report",
             'images_generated': "weewx\.imagegenerator: Generated (\d+) images for",
-            'files_copied': "weewx\.reportengine: Copied (\d+) files",
             'garbage': "weewx\.engine: Garbage collected (\d+) objects",
             'rsync_uploads': "rsync\'d (\d+) files"
         },
         'itemised': {
             'weewxd': {
-                'weewxd_unex_main_loop_exit': "__main__: Unexpected exit from main loop. Program exiting",
                 'errors': {
                     'weewxd_unable_load_driver': "__main__: Unable to load driver",
-
+                    'weewxd_io_error': "__main__: Caught WeeWxIOError:",
+                    'weewxd_dbase_conn_exception': "__main__: Database connection exception:",
+                    'weewxd_dbase_operational_error_exception': "__main__: Database OperationalError exception:",
+                    'weewxd_os_error': "__main__: Caught OSError:",
                 }
             },
             'engine' : {
@@ -716,6 +715,8 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
             'manager': {
                 'manager_cannot_open_db_no_schema': "weewx\.manager: Cannot open database, and no schema specified",
                 'manager_rec_null_time': "weewx\.manager: Archive record with null time encountered",
+                'manager_archive_records_added': "weewx\.manager: Added record [a-zA-Z0-9() :-]+ to database",
+                'manager_summary_records_added': "weewx\.manager: Added record [a-zA-Z0-9() :-]+ to daily summary",
                 'manager_drop_summaries':"weewx\.manager: Dropping daily summary tables from",
                 'errors': {
                     'manager_cannot_get_columns': "weewx\.manager: Cannot get columns of table",
@@ -730,10 +731,10 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
 #                'qc_outside_limits': "weewx\.qc: %s %s value '%s' %s outside limits"
             },
             'reportengine': {
-                'reportengine_ignored': "weewx\.reportengine:         \*\*\*\*  Report ignored",
+                'reportengine_ignored': "weewx\.reportengine: [ *]+  Report ignored",
                 'reportengine_report_timing_skipped': "weewx\.reportengine: Report '[a-zA-Z0-9-_]+' skipped due to report_timing setting",
-                'report_engine_generator_ignored': "weewx\.reportengine:         \*\*\*\*  Generator ignored",
-                'report_engine_generator_terminated': "weewx\.reportengine:         \*\*\*\*  Generator terminated",
+                'report_engine_generator_ignored': "weewx\.reportengine: [ *]+ Generator ignored",
+                'report_engine_generator_terminated': "weewx\.reportengine: [ *]+ Generator terminated",
                 'errors': {
                     'reportengine_invalid_report_timing': "weewx\.reportengine: Invalid report_timing setting for report",
                     'reportengine_invalid_report_timing_error': "weewx\.reportengine:       \*\*\*\*  ",
@@ -1718,9 +1719,9 @@ class WeeWXLogwatchEngine(object):
             sys.path.insert(0, path)
             # iterate over the contents of the directory where we are looking
             # for addon scripts
-            for file in os.listdir(path):
+            for file_name in os.listdir(path):
                 # get the full path to the item
-                current = os.path.join(path, file)
+                current = os.path.join(path, file_name)
                 # check if its a file
                 if os.path.isfile(current):
                     # we have a file, obtain just the name without the
