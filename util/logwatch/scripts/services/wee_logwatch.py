@@ -662,7 +662,8 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
         'sum': {
             'cheetah_generated': "weewx\.cheetahgenerator: Generated (\d+) files for report",
             'images_generated': "weewx\.imagegenerator: Generated (\d+) images for",
-            'garbage': "weewx\.engine: Garbage collected (\d+) objects",
+            'engine_garbage': "weewx\.engine: Garbage collected (\d+) objects",
+            'copy_copied': "weewx\.reportengine: Copied (\d+) files to",
             'rsync_uploads': "rsync\'d (\d+) files"
         },
         'itemised': {
@@ -688,14 +689,14 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                     'engine_archive_delay_long': "weewx\.engine: Archive delay \(\d+\) is unusually long",
                     'engine_ignore_hist_rec': "weewx\.engine: ignore historical record:",
                     'engine_catchup_error': "Internal error detected\. Catchup abandoned",
-                    'engine_catchupe_error_msg': "weewx\.engine: \*\*\*\* ",
+                    'engine_catchup_error_msg': "weewx\.engine: \*\*\*\* ",
                     'engine_read_time_error': "weewx\.engine: Error reading time",
                     'engine_rep_thred_running': "weewx\.engine: Launch of report thread aborted: existing report thread still running",
                     'engine_prev_rep_thread_running': "weewx\.engine: Previous report thread has been running"
                 }
             },
             'copy': {
-                'copy': "weewx\.reportengine: copygenerator: Copied (\d+) files to",
+#                'copy_copied': "weewx\.reportengine: Copied (\d+) files to",
             },
             'ftp': {
                 'ftp': "weewx\.reportengine: ftpgenerator: Ftp'd (\d+) files in (\d+) seconds",
@@ -756,7 +757,7 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                 }
             },
             'restx': {
-                'restc_no_augment': "weewx\.restx: No database specified\. Augmentation from database skipped",
+                'restx_no_augment': "weewx\.restx: No database specified\. Augmentation from database skipped",
                 'restx_skipped': "weewx\.restx: ([^:]*): Skipped record",
                 'restx_bad_login_wait': "weewx\.restx: ([^:]*): Bad login; waiting",
                 'restx_bad_login_terminate': "weewx\.restx: ([^:]*): Bad login; no retry specified. Terminating",
@@ -1134,15 +1135,20 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
     },
     'report': {
         'summary': [
-            {'startups': 'engine: startups'},
-            {'restarts': 'engine: restarts'},
-            {'hup_restarts': 'engine: restart from hup'},
-            {'sigterm_shutdowns': 'engine: restart from SIGTERM'},
-            {'kbd_interrupts': 'engine: keyboard interrupts'},
-            {'garbage': 'engine: garbage collected'},
-            {'archive_records_added': 'archive: records added'},
-            {'summary_records_added': 'daily summaries: records added'},
-            {'files_copied': 'copygenerator: files copied'},
+            {'weewxd_startups': 'engine: startups'},
+            {'zz_weewxd_restarts': 'engine: restarts'},
+            {'weewxd_hup_restarts': 'engine: restart from hup'},
+            {'weewxd_sig_term': 'engine: restart from SIGTERM'},
+            {'weewxd_keyboard_interrupt': 'engine: keyboard interrupts'},
+            {'weewxd_unex_main_loop_exit': 'Unexpected exit from main loop'},
+            {'weewxd_unrecoverable': 'Unrecoverable exceptions'},
+            {'weewxd_recovery_attempts': 'Recovery attempts'},
+            {'engine_garbage': 'engine: garbage collected'},
+            {'manager_archive_records_added': 'archive: records added'},
+            {'manager_summary_records_added': 'daily summaries: records added'},
+            {'cheetah_generated': 'cheetahgenerator: files generated'},
+            {'images_generated': 'imagegenerator: files generated'},
+            {'copy_copied': 'copygenerator: files copied'},
             {'ftp_uploads': 'ftp: files uploaded'},
             {'ftp_fails': 'ftp: failures'},
             {'rsync_uploads': 'rsync: files uploaded'},
@@ -2054,7 +2060,7 @@ class LogwatchProcessor(object):
                 # its a dict
                 for var, label in summary_report_config.items():
                     # if we have content for this item print it
-                    result = self.get_count(var)
+                    result = self.get_result(var, self.results)
                     if result is not None and result > 0:
                         if is_empty:
                             print("Summary counts:")
@@ -2066,7 +2072,7 @@ class LogwatchProcessor(object):
                 for summary_item_dict in summary_report_config:
                     for var, label in summary_item_dict.items():
                         # if we have content for this item print it
-                        result = self.get_count(var)
+                        result = self.get_result(var, self.results)
                         if result is not None and result > 0:
                             if is_empty:
                                 print("Summary counts:")
@@ -2074,17 +2080,17 @@ class LogwatchProcessor(object):
                             print("  %-45s %6d" % (label, result))
         return is_empty
 
-    def get_count(self, var):
-        """Find a result in either 'increment' or 'sum' results."""
-
-        # first look in increment
-        if 'increment' in self.results and var in self.results['increment']:
-            return self.results['increment'][var]
-        elif 'sum' in self.results and var in self.results['sum']:
-            return self.results['sum'][var]
-        else:
-            return None
-
+    # def get_count(self, var):
+    #     """Find a result in either 'increment' or 'sum' results."""
+    #
+    #     # first look in increment
+    #     if 'increment' in self.results and var in self.results['increment']:
+    #         return self.results['increment'][var]
+    #     elif 'sum' in self.results and var in self.results['sum']:
+    #         return self.results['sum'][var]
+    #     else:
+    #         return None
+    #
     def generate_itemised_report(self, detail=0):
         """Generate any itemised reports I know about."""
 
@@ -2123,11 +2129,11 @@ class LogwatchProcessor(object):
                     if 'itemised' in self.results and self.results['itemised'].get(generic_name) is not None:
                         _results = self.results['itemised'][generic_name].get(item)
                         if _results is None:
-                            _results = self.get_count(item)
+                            _results = self.get_result(item, self.results)
                             if _results is None:
                                 continue
                     else:
-                        _results = self.get_count(item)
+                        _results = self.get_result(item, self.results)
                         if _results is None:
                             continue
                     if isinstance(_results, list):
@@ -2183,6 +2189,18 @@ class LogwatchProcessor(object):
 
         pass
 
+    def get_result(self, field_name, results):
+        """Obtain a result given a result field name."""
+
+        if field_name in results:
+            return results[field_name]
+        for val in results.values():
+            if hasattr(val, 'items'):
+                rec_result = self.get_result(field_name, val)
+                if rec_result is not None:
+                    return rec_result
+        return None
+
 
 class WeeWXLogwatchProcessor(LogwatchProcessor):
     """Class to process core WeeWX log files.
@@ -2193,6 +2211,25 @@ class WeeWXLogwatchProcessor(LogwatchProcessor):
     LogWatchProcessor based object should be defined and invoked to process
     such lines.
     """
+
+    SUMMARY_LEVELS = {1: ('weewxd_startups', 'zz_weewxd_restarts',
+                          'weewxd_hup_restarts', 'weewxd_sig_term',
+                          'weewxd_keyboard_interrupt',
+                          'weewxd_unex_main_loop_exit', 'weewxd_unrecoverable',
+                          'weewxd_recovery_attempts', 'engine_garbage',
+                          'manager_archive_records_added',
+                          'manager_summary_records_added', 'cheetah_generated',
+                          'images_generated', 'copy_copied', 'ftp_uploads',
+                          'ftp_fails', 'rsync_uploads', 'rsync_fails',
+                          'vantage_clock_set'),
+                      5: ('weewxd_startups', 'zz_weewxd_restarts',
+                          'weewxd_hup_restarts', 'weewxd_sig_term',
+                          'weewxd_keyboard_interrupt',
+                          'weewxd_unex_main_loop_exit', 'weewxd_unrecoverable',
+                          'weewxd_recovery_attempts', 'engine_garbage',
+                          'manager_archive_records_added',
+                          'manager_summary_records_added', 'vantage_clock_set')
+                      }
 
     def __init__(self, filter_config_dict):
         # initialize my base class
@@ -2267,16 +2304,26 @@ class WeeWXLogwatchProcessor(LogwatchProcessor):
         summary_report_config = self.report_config.get('summary', [])
         # do we have any summary requirements
         if len(summary_report_config) > 0:
+            # get a tuple containing the summary report fields to be displayed
+            # given the detail level
+            key_distance = [(k, detail - k) for k in self.SUMMARY_LEVELS.keys() if k <= detail]
+            key = min(key_distance, key=lambda x:(x[1]))[0]
+            summary_fields_t = self.SUMMARY_LEVELS[key]
             # iterate over each summary report item
             for summary_item_dict in summary_report_config:
                 for var, label in summary_item_dict.items():
+                    if var not in summary_fields_t:
+                        continue
                     # if we have content for this item print it
-                    result = self.get_count(var)
-                    if result is not None and result > 0:
-                        if is_empty:
-                            print("Summary counts:")
-                            is_empty = False
-                        print("  %-45s %6d" % (label, result))
+                    result = self.get_result(var, self.results)
+                    try:
+                        if result is not None and result > 0:
+                            if is_empty:
+                                print("Summary counts:")
+                                is_empty = False
+                            print("  %-45s %6d" % (label, result))
+                    except:
+                        print("result=%s" % (result,))
         return is_empty
 
     def generate_restx_itemised_report(self, restx_report_config, detail=0):
@@ -2339,11 +2386,11 @@ class WeeWXLogwatchProcessor(LogwatchProcessor):
                     if self.results['itemised'].get('image_generator') is not None:
                         _results = self.results['itemised']['image_generator'].get(item)
                         if _results is None:
-                            _results = self.get_count(item)
+                            _results = self.get_result(item, self.results)
                             if _results is None:
                                 continue
                     else:
-                        _results = self.get_count(item)
+                        _results = self.get_result(item, self.results)
                         if _results is None:
                             continue
                     if _results is not None:
