@@ -650,15 +650,6 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                    "weewx\.drivers\.ws28xx: stopping rf communication",
                    "weewx\.drivers\.ws28xx: SetTime/SetConfig data written"
                    ],
-        'increment': {
-            'weewxd_startups': "__main__: Starting up weewx version",
-            'weewxd_hup_restarts': "__main__: Received signal HUP\. Restarting",
-            'weewxd_sig_term': "__main__: Received signal TERM \(15\)",
-            'weewxd_keyboard_interrupt': "__main__: Keyboard interrupt",
-            'weewxd_unex_main_loop_exit': "__main__: Unexpected exit from main loop. Program exiting",
-            'weewxd_unrecoverable': "__main__: Caught unrecoverable exception:",
-            'weewxd_recovery_attempts': "__main__: retrying[.]+",
-        },
         'sum': {
             'cheetah_generated': "weewx\.cheetahgenerator: Generated (\d+) files for report",
             'images_generated': "weewx\.imagegenerator: Generated (\d+) images for",
@@ -668,6 +659,13 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
         },
         'itemised': {
             'weewxd': {
+                'weewxd_startups': "__main__: Starting up weewx version",
+                'weewxd_hup_restarts': "__main__: Received signal HUP\. Restarting",
+                'weewxd_sig_term': "__main__: Received signal TERM \(15\)",
+                'weewxd_keyboard_interrupt': "__main__: Keyboard interrupt",
+                'weewxd_unex_main_loop_exit': "__main__: Unexpected exit from main loop. Program exiting",
+                'weewxd_unrecoverable': "__main__: Caught unrecoverable exception:",
+                'weewxd_recovery_attempts': "__main__: retrying[.]+",
                 'errors': {
                     'weewxd_unable_load_driver': "__main__: Unable to load driver",
                     'weewxd_io_error': "__main__: Caught WeeWxIOError:",
@@ -1906,19 +1904,6 @@ class LogwatchProcessor(object):
         # construct a dict of compiled regex we understand
         # first, initialise a dict to hold the compiled regex
         self.regexs = {}
-        # populate the compiled 'increment' res
-        if 'increment' in self.ingest_config:
-            # add a placeholder for 'increment' results
-            self.results['increment'] = {}
-            # create a dict to hold the compiled res
-            self.regexs['increment'] = {}
-            # iterate over our 'increment' config compiling res and
-            # initialising counts
-            for var, filter_str in self.ingest_config['increment'].items():
-                # compile the re and save it
-                self.regexs['increment'][var] = re.compile(filter_str)
-                # initialise the corresponding count
-                self.results['increment'][var] = 0
         # populate the compiled 'sum' res
         if 'sum' in self.ingest_config:
             # add a placeholder for 'sum' results
@@ -1975,16 +1960,6 @@ class LogwatchProcessor(object):
         if no match is found return False.
         """
 
-        # do we have any 'increment' regex's
-        if 'increment' in self.regexs:
-            # we have some regexs, so iterate over them
-            for var, comp_regex in self.regexs['increment'].items():
-                # now check if the regex finds a match
-                if comp_regex.search(line):
-                    # match found, so increment the relevant result
-                    self.results['increment'][var] += 1
-                    # since we have a match we can stop looking and return
-                    return True
         # do we have any 'sum' regex's
         if 'sum' in self.regexs:
             # we have some regexs, so iterate over them
@@ -2080,17 +2055,6 @@ class LogwatchProcessor(object):
                             print("  %-45s %6d" % (label, result))
         return is_empty
 
-    # def get_count(self, var):
-    #     """Find a result in either 'increment' or 'sum' results."""
-    #
-    #     # first look in increment
-    #     if 'increment' in self.results and var in self.results['increment']:
-    #         return self.results['increment'][var]
-    #     elif 'sum' in self.results and var in self.results['sum']:
-    #         return self.results['sum'][var]
-    #     else:
-    #         return None
-    #
     def generate_itemised_report(self, detail=0):
         """Generate any itemised reports I know about."""
 
@@ -2125,7 +2089,7 @@ class LogwatchProcessor(object):
             # iterate over the entries
             for item_config in items_report_config:
                 for item, data in item_config.items():
-                    # TODO. Need cover for cases where 'increment', 'sum' or 'itemised' is not in self.results
+                    # TODO. Need cover for cases where 'sum' or 'itemised' is not in self.results
                     if 'itemised' in self.results and self.results['itemised'].get(generic_name) is not None:
                         _results = self.results['itemised'][generic_name].get(item)
                         if _results is None:
@@ -2334,7 +2298,7 @@ class WeeWXLogwatchProcessor(LogwatchProcessor):
             # iterate over the entries
             for item_config in items_report_config:
                 for item, data in item_config.items():
-                    # TODO. Need cover for cases where 'increment', 'sum' or 'itemised' is not in self.results
+                    # TODO. Need cover for cases where 'sum' or 'itemised' is not in self.results
                     if 'itemised' in self.results and self.results['itemised'].get(generic_name) is not None:
                         _results = self.results['itemised'][generic_name].get(item)
 
