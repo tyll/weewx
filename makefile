@@ -24,7 +24,7 @@ CWD = $(shell pwd)
 BLDDIR=build
 DSTDIR=dist
 
-PYTHON=python
+PYTHON=python3
 
 all: help
 
@@ -87,6 +87,8 @@ endif
 test:
 	@rm -f $(BLDDIR)/test-results
 	@mkdir -p $(BLDDIR)
+	@echo "Python interpreter in use:" >> $(BLDDIR)/test-results 2>&1;
+	@$(PYTHON) -c "import sys;print(sys.executable+'\n')" >> $(BLDDIR)/test-results 2>&1;
 	@for f in $(SUITE); do \
   echo running $$f; \
   echo $$f >> $(BLDDIR)/test-results; \
