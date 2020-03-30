@@ -82,13 +82,14 @@ Extending the WeeWX logwatch script:
 
 
 """
+# TODO. Changes to WeeWX code
 # TODO. manager.py better log entry for lines 883 and 884
 # TODO. manager.py better log entry for lines 1032 and 1033
-# TODO. Get obs outside qc limits
 # TODO. reportengine.py maybe change format of line 173 output
 # TODO. reportengine.py maybe change format of line 189 output
-# TODO. need custom report method for rsync
-# TODO. ftp report needs checking to make sure all data is used where relevant
+
+# TODO. Better capture
+# TODO. Get obs outside qc limits
 # TODO. restx_db_error should capture protocol name and error
 # TODO. restx_upload_errors should capture protocol name and error
 # TODO. restx_bad_cert_wait should capture protocol name and error
@@ -101,6 +102,10 @@ Extending the WeeWX logwatch script:
 # TODO. restx_response_exception should capture protocol name and error
 # TODO. restx_missing_config should capture protocol name and error
 # TODO. restx_missing_option should capture protocol name and error
+
+# TODO. Reporting
+# TODO. need custom report method for rsync
+# TODO. ftp report needs checking to make sure all data is used where relevant
 # current to commit eb4d4e1dc05d5d064a7313b0607f196cd4a0a48f
 
 # Python imports
@@ -1155,6 +1160,129 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
         ],
         'itemised': [
             {
+                'weewxd': {
+                    'label': "WeeWX",
+                    'items': [
+                        {'weewxd_startups': "Engine startups"},
+                        {'weewxd_hup_restarts': "Engine restarts"},
+                        {'weewxd_sig_term': "__main__: Received signal TERM \(15\)"},
+                        {'weewxd_keyboard_interrupt': "Keyboard interrupts"},
+                        {'weewxd_unex_main_loop_exit': "Unexpected exit from main loop"},
+                        {'weewxd_unrecoverable': "Caught unrecoverable exception"},
+                        {'weewxd_recovery_attempts': "Recovery attempts"}
+                    ],
+                    'errors': {
+                        'label': 'Errors/warnings',
+                        'items': [
+                            {'weewxd_unable_load_driver': "Unable to load driver"},
+                            {'weewxd_io_error': "WeeWxIOError"},
+                            {'weewxd_dbase_conn_exception': "Database connection exception"},
+                            {'weewxd_dbase_operational_error_exception': "Database OperationalError exception"},
+                            {'weewxd_os_error': "OSError"}
+                        ]
+                    },
+                },
+                'engine': {
+                    'label': "WeeWX engine",
+                    'items': [
+                        {'engine_garbage': 'engine: garbage collected'},
+                        {'engine_unable_launch_rep_thread': "Unable to launch report thread"},
+                        {'engine_unable_shut_rep_thread': "Unable to shut down report thread"}
+                    ],
+                    'errors': {
+                        'label': "Errors/warnings",
+                        'items': [
+                            {'engine_driver_import_fail': "Import of driver failed"},
+                            {'engine_packet_loop_exit': "Packet loop exited"},
+                            {'engine_stdcal_loop_error': "StdCalibration loop error"},
+                            {'engine_stdcal_archive_error': "StdCalibration archive error"},
+                            {'engine_archive_int_error': "Archive interval config/hardware mismatch"},
+                            {'engine_unknown_rec_gen': "Unknown type of record generation"},
+                            {'engine_archive_delay_long': "Archive delay is unusually long"},
+                            {'engine_ignore_hist_rec': "Historical records ingored"},
+                            {'engine_catchup_error': "Internal error, catchup abandoned"},
+                            {'engine_read_time_error': "Error reading time"},
+                            {'engine_rep_thred_running': "Report thread launch aborted (existing report thread still running)"},
+                            {'engine_prev_rep_thread_running': "Report thread launched desite previous report thread still running"}
+                        ]
+                    },
+                },
+                'manager': {
+                    'label': 'Archive',
+                    'items': [
+                        {'manager_cannot_open_db_no_schema': "Cannot open database and no schema specified"},
+                        {'manager_rec_null_time': "Archive records with null time encountered"},
+                        {'manager_archive_records_added': "Records added to archive table"},
+                        {'manager_summary_records_added': "Records added to daily summary tables"},
+                        {'manager_drop_summaries': "Daily summaries dropped"}
+                    ],
+                    'errors': {
+                        'label': "Errors/warnings",
+                        'items': [
+                            {'manager_cannot_get_columns': "Cannot get columns of table"},
+                            {'manager_unable_create_table': "Unable to create table"},
+                            {'manager_unable_add_rec': "Unable to add record"},
+                            {'manager_replace_failed': "Replace failed for database"},
+                            {'manager_drop_summaries_fail': "Failed to drop daily summary tables"}
+                        ],
+                    }
+                },
+                'cheetah_generator': {
+                    'label': "Cheetah generator",
+                    'items': [
+                        {'cheetah_generated': "Files generated"}
+                    ]
+                },
+                'image_generator': {
+                    'label': "Image generator",
+                    'items': [
+                        {'images_generated': "Images generated"}
+                    ],
+                    'errors': {
+                        'label': "Errors",
+                        'items': [
+                            {'image_gen_agg_errors': "Aggregate interval missing"}
+                        ]
+                    }
+                },
+                'copy_generator': {
+                    'label': "Copy generator",
+                    'items': [
+                        {'copy_copied': "Files copied"}
+                    ]
+                },
+                'ftp_generator': {
+                    'label': "FTP generator",
+                    'items': [
+                        {'ftp_uploads': "Files uploaded"},
+                        {'ftp_fails': "Failed uploads"}
+                    ],
+                    'errors': {
+                        'label': 'Errors',
+                        'items': [
+                            {'ftp_exception': "Exceptions caught"},
+                            {'ftp_connect_fail_attempt': "Failed server connection attempts"},
+                            {'ftp_connect_fail': "Failed server connections"},
+                            {'ftp_upload_fail_attempt': "Failed upload attempts"},
+                            {'ftp_make_dir_error': "Errors received while creating remote directory"},
+                            {'ftp_make_dir_fail': "Failed attempts to create remote directory"}
+                        ]
+                    }
+                },
+                'rsync_generator': {
+                    'label': "RSYNC generator",
+                    'items': [
+                        {'rsync_executed': "RSYNC sessions"},
+                        {'rsync_files_uploaded': "Files processed"}
+                    ],
+                    'errors': {
+                        'label': 'Errors',
+                        'items': [
+                            {'rsync_exception': "Exceptions caught"},
+                            {'rsync_errors': "RSYNC sessions with errors"}
+                        ]
+                    }
+                },
                 'restx': {
                     'label': "RESTful services",
                     'items': [
@@ -1181,24 +1309,6 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'restx_no_station_url': "No station URL specified"},
                             {'restx_missing_config': "No config info"},
                             {'restx_missing_option': "Missing option"}
-                        ]
-                    }
-                },
-                'cheetah_generator': {
-                    'label': "Cheetah generator",
-                    'items': [
-                        {'cheetah_generated': "Files generated"}
-                    ]
-                },
-                'image_generator': {
-                    'label': "Image generator",
-                    'items': [
-                        {'images_generated': "Images generated"}
-                    ],
-                    'errors': {
-                        'label': "Errors",
-                        'items': [
-                            {'image_gen_agg_errors': "Aggregate interval missing"}
                         ]
                     }
                 },
