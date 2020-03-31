@@ -1227,6 +1227,25 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                         ],
                     }
                 },
+                'reportengine': {
+                    'label': "Report engine",
+                    'items': [
+                        {'reportengine_ignored': "Reports ignored"},
+                        {'reportengine_report_timing_skipped': "Reports skipped due to report_timing"},
+                        {'report_engine_generator_ignored': "Generators ignored"},
+                        {'report_engine_generator_terminated': "Generators terminated"},
+                    ],
+                    'errors': {
+                        'label': 'Errors',
+                        'items': [
+                            {'reportengine_invalid_report_timing': "Invalid report_timing setting"},
+                            {'reportengine_cannot_instantiate_gen': "Unable to instantiate generator"},
+                            {'reportengine_unrecov_exception_gen': "Caught unrecoverable exception in generator"},
+                            {'reportengine_cannot_read_skin_conf': "Cannot read skin configuration file"},
+                            {'reportengine_failed_read_skin_conf': "Failed to read skin configuration file"},
+                        ]
+                    },
+                },
                 'cheetah_generator': {
                     'label': "Cheetah generator",
                     'items': [
@@ -1241,7 +1260,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                     'errors': {
                         'label': "Errors",
                         'items': [
-                            {'image_gen_agg_errors': "Aggregate interval missing"}
+                            {'image_gen_agg_errors': "Aggregate interval missing"},
+                            {'image_gen_gap_frac': "Gap fraction outside range"},
+                            {'image_gen_unable_save_file': "Unable to save to file"}
                         ]
                     }
                 },
@@ -1283,6 +1304,12 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                         ]
                     }
                 },
+                'qc': {
+                    'label': "Quality control service",
+                    'items': [
+                        {'qc_no_config': "No quality control information in config file"}
+                    ]
+                },
                 'restx': {
                     'label': "RESTful services",
                     'items': [
@@ -1309,6 +1336,38 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'restx_no_station_url': "No station URL specified"},
                             {'restx_missing_config': "No config info"},
                             {'restx_missing_option': "Missing option"}
+                        ]
+                    }
+                },
+                'general': {
+                    'label': "General",
+                    'items': [
+                        {'wxservices_et_mixed_units': "Mixed unit system in evapotranspiration calculation"}
+                    ],
+                    'errors': {
+                        'label': "Errors",
+                        'items': [
+                            {'units_cannot_convert': "Unable to convert"},
+                            {'wxformulas_rain_counter_reset': "Rain counter reset detected"},
+                            {'wxservices_unknown_extens_type': "Unknown extensible type"},
+                            {'wxservices_unknown_agg': "Unknown aggregation"},
+                            {'wxservices_et_failed': "Calculation of evapotranspiration failed"},
+                            {'wxservices_db_error_rainrate': "Database error while initializing rainRate"}
+                        ]
+                    }
+                },
+                'fixes': {
+                    'label': "Fixes",
+                    'items': [
+                        {'maxwindspeed_fix_applied': "Maximum windSpeed fix applied"},
+                        {'db_interval_weight_applied': "Interval weighting fix applied"}
+                    ],
+                    'errors': {
+                        'label': "Errors/warnings",
+                        'items': [
+                            {'maxwindspeed_fix_fail': "Maximum windSpeed fix not applied"},
+                            {'db_interval_weight_not_applied': "Interval weighting fix not applied"},
+                            {'db_interval_weight_fix_fail': "Interval weighting fix failed"}
                         ]
                     }
                 },
@@ -1776,7 +1835,7 @@ class WeeWXLogwatchEngine(object):
         self.detail = detail
         # now obtain a list of logwatch processor objects that we will use
         # first off the default WeeWX processor
-        self.processor_objects = [WeeWXLogwatchProcessor(WEEWX_LOGWATCH_CONFIG_DEFAULT), ]
+        self.processor_objects = [WeeWXLogwatchProcessor(ConfigObj(WEEWX_LOGWATCH_CONFIG_DEFAULT)), ]
         # now add any that may be in ext.d
         ext_processor_objects = self.get_processors()
         self.processor_objects += ext_processor_objects
