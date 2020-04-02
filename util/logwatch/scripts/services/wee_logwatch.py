@@ -1181,7 +1181,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'weewxd_os_error': "OSError"}
                         ]
                     },
-                },
+                }
+            },
+            {
                 'engine': {
                     'label': "WeeWX engine",
                     'items': [
@@ -1206,7 +1208,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'engine_prev_rep_thread_running': "Report thread launched desite previous report thread still running"}
                         ]
                     },
-                },
+                }
+            },
+            {
                 'manager': {
                     'label': 'Archive',
                     'items': [
@@ -1226,7 +1230,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'manager_drop_summaries_fail': "Failed to drop daily summary tables"}
                         ],
                     }
-                },
+                }
+            },
+            {
                 'reportengine': {
                     'label': "Report engine",
                     'items': [
@@ -1245,13 +1251,17 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'reportengine_failed_read_skin_conf': "Failed to read skin configuration file"},
                         ]
                     },
-                },
+                }
+            },
+            {
                 'cheetah_generator': {
                     'label': "Cheetah generator",
                     'items': [
                         {'cheetah_generated': "Files generated"}
                     ]
-                },
+                }
+            },
+            {
                 'image_generator': {
                     'label': "Image generator",
                     'items': [
@@ -1265,13 +1275,17 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'image_gen_unable_save_file': "Unable to save to file"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'copy_generator': {
                     'label': "Copy generator",
                     'items': [
                         {'copy_copied': "Files copied"}
                     ]
-                },
+                }
+            },
+            {
                 'ftp_generator': {
                     'label': "FTP generator",
                     'items': [
@@ -1289,7 +1303,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'ftp_make_dir_fail': "Failed attempts to create remote directory"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'rsync_generator': {
                     'label': "RSYNC generator",
                     'items': [
@@ -1303,13 +1319,17 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'rsync_errors': "RSYNC sessions with errors"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'qc': {
                     'label': "Quality control service",
                     'items': [
                         {'qc_no_config': "No quality control information in config file"}
                     ]
-                },
+                }
+            },
+            {
                 'restx': {
                     'label': "RESTful services",
                     'items': [
@@ -1338,7 +1358,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'restx_missing_option': "Missing option"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'general': {
                     'label': "General",
                     'items': [
@@ -1355,7 +1377,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'wxservices_db_error_rainrate': "Database error while initializing rainRate"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'fixes': {
                     'label': "Fixes",
                     'items': [
@@ -1370,7 +1394,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'db_interval_weight_fix_fail': "Interval weighting fix failed"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'acurite': {
                     'label': "Acurite",
                     'items': [
@@ -1399,7 +1425,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'acurite_r3_bad_format': "R3 bad format in row"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'cc3000': {
                     'label': "CC3000",
                     'items': [
@@ -1431,7 +1459,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'cc3000_unexpected_rec': "Unexpected record"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'fousb': {
                     'label': "FineOffset USB",
                     'items': [
@@ -1467,7 +1497,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'fousb_magic_num_changed': "Magic number changed"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'te923': {
                     'label': "TE923",
                     'errors': {
@@ -1490,7 +1522,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'te923_unrecog_interval': "Unrecognized archive interval"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'ultimeter': {
                     'label': "Ultimeter",
                     'items': [
@@ -1509,7 +1543,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'ultimeter_decode_fail': "Decode failed"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'vantage': {
                     'label': "Vantage",
                     'items': [
@@ -1558,8 +1594,10 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'vantage_unknown_bucket': "Unknown bucket type"},
                             {'vantage_unknown_loop': "Unknown LOOP packet type"}
                         ]
-                    },
-                },
+                    }
+                }
+            },
+            {
                 'wmr9x8': {
                     'label': "WMR9x8",
                     'items': [
@@ -1571,7 +1609,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'wmr9x8_invalid_packet': "Invalid data packet"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'wmr100': {
                     'label': "WMR100",
                     'items': [
@@ -1589,7 +1629,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'wmr100_bad_usb_report': "Bad USB report received"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'wmr200': {
                     'label': "WMR200",
                     'items': [
@@ -1644,7 +1686,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'wmr200exit_live_packets_queued': "Exiting with packets still in live queue"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'wmr300': {
                     'label': "WMR300",
                     'items': [
@@ -1676,7 +1720,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'wmr300_read': "Read USB errors"},
                         ]
                     }
-                },
+                }
+            },
+            {
                 'ws1': {
                     'label': "WS1",
                     'items': [
@@ -1695,7 +1741,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'ws1_get_data_fail': "Failed to get data"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'ws23xx': {
                     'label': "WS23XX",
                     'items': [
@@ -1712,7 +1760,9 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'ws23xx_invalid_wind_speed': "Invalid wind reading"}
                         ]
                     }
-                },
+                }
+            },
+            {
                 'ws28xx': {
                     'label': "WS28XX",
                     'items': [
@@ -1750,7 +1800,7 @@ WEEWX_LOGWATCH_CONFIG_DEFAULT = {
                             {'ws28xx_gen_response_fail': "generateResponse() failed"}
                         ]
                     }
-                },
+                }
             }
         ]
     }
