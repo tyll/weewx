@@ -41,115 +41,9 @@ this_dir = os.path.abspath(os.path.dirname(this_file))
 
 
 # ==============================================================================
-# install
-# ==============================================================================
-
-class weewx_install(install):
-    """Specialized version of install, which runs a post-install script"""
-
-    def finalize_options(self):
-        # Call my superclass's version
-        install.finalize_options(self)
-        # Unless the --force flag has been explicitly set, default to True. This will
-        # cause files to be installed even if they are older than their target."""
-        if self.force is None:
-            self.force = 1
-
-    def run(self):
-        """Specialized version of run, which runs post-install commands"""
-
-        # First run the install.
-        rv = install.run(self)
-
-        # Now the post-install
-        update_and_install_config(self.install_data, self.install_scripts, self.install_lib)
-
-        return rv
-
-
-# ==============================================================================
-# install_lib
-# ==============================================================================
-
-class weewx_install_lib(install_lib):
-    """Specialized version of install_lib, which saves and restores the 'user' subdirectory."""
-
-    def run(self):
-        """Specialized version of run that saves, then restores, the 'user' subdirectory."""
-
-        # Save any existing 'user' subdirectory:
-        user_dir = os.path.join(self.install_dir, 'user')
-        if not self.dry_run and os.path.exists(user_dir):
-            user_backup_dir = user_dir + ".bak"
-            shutil.move(user_dir, user_backup_dir)
-        else:
-            user_backup_dir = None
-
-        # Run the superclass's version. This will install a new 'user' subdirectory.
-        install_lib.run(self)
-
-        # Restore the 'user' subdirectory
-        if user_backup_dir:
-            # Delete the freshly installed user subdirectory
-            shutil.rmtree(user_dir)
-            # Replace it with our saved version.
-            shutil.move(user_backup_dir, user_dir)
-
-
-# ==============================================================================
-# install_data
-# ==============================================================================
-
-class weewx_install_data(install_data):
-    """Specialized version of install_data."""
-
-    def run(self):
-        # If there is a skins directory already, just install what the user doesn't already have.
-        if os.path.exists(os.path.join(self.install_dir, 'skins')):
-            # A skins directory already exists. Build a list of skins that are missing and should
-            # be added to it.
-            install_files = []
-            for skin_name in ['Ftp', 'Mobile', 'Rsync', 'Seasons', 'Smartphone', 'Standard']:
-                rel_name = 'skins/' + skin_name
-                if not os.path.exists(os.path.join(self.install_dir, rel_name)):
-                    # The skin has not already been installed. Include it.
-                    install_files += [dat for dat in self.data_files if
-                                      dat[0].startswith(rel_name)]
-            # Exclude all the skins files...
-            other_files = [dat for dat in self.data_files if not dat[0].startswith('skins')]
-            # ... then add the needed skins back in
-            self.data_files = other_files + install_files
-
-        # Run the superclass's run():
-        return install_data.run(self)
-
-    def copy_file(self, f, install_dir, **kwargs):
-        # If this is the configuration file, then process it separately
-        if f == 'weewx.conf':
-            rv = self.process_config_file(f, install_dir, **kwargs)
-        else:
-            rv = install_data.copy_file(self, f, install_dir, **kwargs)
-        return rv
-
-    def process_config_file(self, f, install_dir, **kwargs):
-        """Process weewx.conf separately"""
-
-        # Location of the incoming weewx.conf file
-        install_path = os.path.join(install_dir, os.path.basename(f))
-
-        # Install the config file using the template name. Later, we will merge
-        # it with any old config file.
-        template_name = install_path + "." + VERSION
-        rv = install_data.copy_file(self, f, template_name, **kwargs)
-        shutil.copymode(f, template_name)
-
-        return rv
-
-
-# ==============================================================================
 # utilities
 # ==============================================================================
-def find_files(directory, file_excludes=['*.pyc', "junk*"], dir_excludes=['*/__pycache__']):
+def find_files(directory, prefix="weewx", file_excludes=['*.pyc', "junk*"], dir_excludes=['*/__pycache__']):
     """Find all files under a directory, honoring some exclusions.
 
     Returns:
@@ -175,57 +69,9 @@ def find_files(directory, file_excludes=['*.pyc', "junk*"], dir_excludes=['*/__p
                     and not any(fnmatch.fnmatch(filepath, f) for f in file_excludes):
                 file_list.append(filepath)
         # Add the directory and the list of files in it, to the list of all files.
-        data_files.append((d_path, file_list))
+        data_files.append((os.path.join(prefix, d_path), file_list))
+    print(data_files)
     return data_files
-
-
-def update_and_install_config(install_dir, install_scripts, install_lib, config_name='weewx.conf'):
-    """Install the configuration file, weewx.conf, updating it if necessary.
-
-    install_dir: the directory containing the configuration file.
-
-    install_scripts: the directory containing the weewx executables.
-
-    install_lib: the directory containing the weewx packages.
-
-    config_name: the name of the configuration file. Defaults to 'weewx.conf'
-    """
-
-    # This is where the weewx.conf file will go
-    config_path = os.path.join(install_dir, config_name)
-
-    # Is there an existing file?
-    if os.path.isfile(config_path):
-        # Yes, so this is an upgrade
-        args = [sys.executable,
-                os.path.join(install_scripts, 'wee_config'),
-                '--upgrade',
-                '--config=%s' % config_path,
-                '--dist-config=%s' % config_path + '.' + VERSION,
-                '--output=%s' % config_path,
-                ]
-    else:
-        # No existing config file. This is an install
-        args = [sys.executable,
-                os.path.join(install_scripts, 'wee_config'),
-                '--install',
-                '--dist-config=%s' % config_path + '.' + VERSION,
-                '--output=%s' % config_path,
-                ]
-
-    if DEBUG:
-        print("Command used to invoke wee_config: %s" % args)
-
-    proc = subprocess.Popen(args,
-                            env={'PYTHONPATH': install_lib},
-                            stdin=sys.stdin,
-                            stdout=sys.stdout,
-                            stderr=sys.stderr)
-    out, err = proc.communicate()
-    if DEBUG and out:
-        print('out=', out.decode())
-    if DEBUG and err:
-        print('err=', err.decode())
 
 
 # ==============================================================================
@@ -243,7 +89,7 @@ if __name__ == "__main__":
           author_email='tkeffer@gmail.com',
           url='http://www.weewx.com',
           license='GPLv3',
-          py_modules=['daemon', 'six'],
+          py_modules=['daemon'],
           package_dir={'': 'bin'},
           packages=['schemas',
                     'user',
@@ -263,14 +109,9 @@ if __name__ == "__main__":
                    'bin/wee_reports',
                    'bin/weewxd',
                    'bin/wunderfixer'],
-          data_files=[('', ['LICENSE.txt', 'README.md', 'weewx.conf']), ]
-                     + find_files('docs')
-                     + find_files('examples')
-                     + find_files('skins')
-                     + find_files('util'),
-          cmdclass={
-              "install": weewx_install,
-              "install_data": weewx_install_data,
-              "install_lib": weewx_install_lib,
-          },
+          data_files=[('weewx', ['LICENSE.txt', 'README.md', 'weewx.conf']), ]
+                      + find_files('docs')
+                      + find_files('examples')
+                      + find_files('skins')
+                      + find_files('util'),
           )
